@@ -1,8 +1,29 @@
-params [
-	["_dropPosition",[0,0,0],[[]]]
-];
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_createCorvette
 
-private _namespace = call CBA_fnc_createNamespace;
+Description:
+	Creates a (lite) corvette at the requested position
+
+Parameters:
+	NONE
+
+Returns:
+	_corvetteObjects <ARRAY> - The OBJECTS that make up the corvette
+
+Examples:
+    (begin example)
+
+		call OPTRE_fnc_createCorvette;
+
+    (end)
+
+Author:
+	Ansible2 // Cipher
+---------------------------------------------------------------------------- */
+
+params [
+	["_spawnPosition",[0,0,0],[[]]]
+];
 
 private _corvetteInfo = [
 	["OPTRE_tail",[0,0,-9.60278],[[0,1,0],[0,0,1]]],
@@ -15,7 +36,7 @@ private _corvetteInfo = [
 ];
 
 private _corvetteObjects = [];
-
+private "_corvetteCenter";
 {
 	_x params [
 		["_type","",[""]],
@@ -27,18 +48,14 @@ private _corvetteObjects = [];
 	_corvetteObjects pushBack _piece;
 	
 	if (_forEachIndex isEqualTo 0) then {
-		_namespace setVariable ["corvetterCenter",_piece];
-		_piece setPosATL _dropPosition;
+		_corvetteCenter = _piece;
+		_piece setPosATL _spawnPosition;
 		_piece setVectorDirAndUp _vectorsRelative;
 	} else {
-		private _center = _namespace getVariable "corvetterCenter";
-		_piece setPosATL (_center modelToWorldVisual _posRelative);
-
-		_piece setVectorDirAndUp [(_center vectorModelToWorldVisual (_vectorsRelative select 0)),(_center vectorModelToWorldVisual (_vectorsRelative select 1))];
+		_piece setPosATL (_corvetteCenter modelToWorldVisual _posRelative);
+		_piece setVectorDirAndUp [(_corvetteCenter vectorModelToWorldVisual (_vectorsRelative select 0)),(_corvetteCenter vectorModelToWorldVisual (_vectorsRelative select 1))];
 	};
 
 } forEach _corvetteInfo;
-
-_namespace call CBA_fnc_deleteNamespace;
 
 _corvetteObjects
