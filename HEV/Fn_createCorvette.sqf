@@ -5,7 +5,7 @@ Description:
 	Creates a (lite) corvette at the requested position
 
 Parameters:
-	NONE
+	0: _spawnPosition <ARRAY or OBJECT> - The position (ATL) of where you want the corvette to spawn
 
 Returns:
 	_corvetteObjects <ARRAY> - The OBJECTS that make up the corvette
@@ -13,7 +13,7 @@ Returns:
 Examples:
     (begin example)
 
-		call OPTRE_fnc_createCorvette;
+		[(getPosATL player) vectorAdd [0,0,100]] call OPTRE_fnc_createCorvette;
 
     (end)
 
@@ -24,6 +24,20 @@ Author:
 params [
 	["_spawnPosition",[0,0,0],[[]]]
 ];
+
+if (_spawnPosition isEqualType objNull AND {isNull _spawnPosition}) exitWith {
+	"_spawnPosition isNull" call BIS_fnc_error;
+	[]
+};
+
+if (_spawnPosition isEqualTo []) exitWith {
+	"_spawnPosition is empty array" call BIS_fnc_error;
+	[]
+};
+
+if (_spawnPosition isEqualType objNull) then {
+	_spawnPosition = getPosATL _spawnPosition;
+};
 
 private _corvetteInfo = [
 	["OPTRE_tail",[0,0,-9.60278],[[0,1,0],[0,0,1]]],
