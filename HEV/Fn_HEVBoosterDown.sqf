@@ -25,7 +25,7 @@ playSound3D ["OPTRE_FunctionsLibrary\sound\PodDetach.ogg",_hev,false,getPosASL _
 _light = "#lightpoint" createVehicle [0,0,0];
 [0,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light", _listOfPlayers, false];
 
-_fire = "#particlesource" createVehicle [0,0,0]; 
+private _fire = "#particlesource" createVehicle [0,0,0]; 
 _fire setParticleClass "Missile2";
 _fire attachto [_hev,[0,-0.2,0.6]];
 
