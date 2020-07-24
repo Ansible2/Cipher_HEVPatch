@@ -12,7 +12,7 @@
 	Prams:
 	0: Object: HEV
 	1: Number: 0 = emergency eject door, 1 = open door
-	2: Bool: true forces the HEV driver to leave the vehicle, false does nothing
+	2: Bool: true forces the HEV gunner to leave the vehicle, false does nothing
 	
 	Example 1:
 	0 = [vehicle player, 0, true] spawn OPTRE_Fnc_HEVDoor;
@@ -89,10 +89,10 @@ if (_eject) then {
 			params [
 				["_hev",objNull,[objNull]]
 			];
-			private _driver = driver _hev; 
+			private _gunner = gunner _hev; 
 
-			_driver action ["getOut", _hev];
-			_driver leaveVehicle _hev;
+			_gunner action ["getOut", _hev];
+			_gunner leaveVehicle _hev;
 		},
 		[_hev],
 		1

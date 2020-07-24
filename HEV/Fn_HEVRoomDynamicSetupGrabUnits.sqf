@@ -61,11 +61,11 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 
 	// start loading screen effect and push all units in the pods into _units array
 	_linkedPods apply {
-		private _driver = driver _x;
-		if (alive _driver) then {
-			_units pushBack _driver; 
-			if (_driver in allPlayers) then {
-				[999,["OPTRE_LoadScreen", "PLAIN"]] remoteExec ["cutRsc", _driver];
+		private _gunner = gunner _x;
+		if (alive _gunner) then {
+			_units pushBack _gunner; 
+			if (_gunner in allPlayers) then {
+				[999,["OPTRE_LoadScreen", "PLAIN"]] remoteExec ["cutRsc", _gunner];
 			};
 		};
 	};

@@ -60,6 +60,10 @@ class CfgFunctions
 			{
 				file="Cipher_HEVPatch\HEV\Fn_SpawnFakeHEVRoom.sqf";
 			};
+			class SpawnHEVsCorvette
+			{
+				file="Cipher_HEVPatch\HEV\Fn_SpawnHEVsCorvette.sqf";
+			};
 			class SpawnHEVsFrigate
 			{
 				file="Cipher_HEVPatch\HEV\Fn_SpawnHEVsFrigate.sqf";

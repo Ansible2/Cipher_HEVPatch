@@ -29,7 +29,7 @@ if (!alive _hev) exitWith {};
 
         private _atmoEffects = [_fire,_light];
 
-        if (_hev in _hevArrayPlayer AND {alive (driver _hev)}) then { 
+        if (_hev in _hevArrayPlayer AND {alive (gunner _hev)}) then { 
             [40, _hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds; 
         };
 

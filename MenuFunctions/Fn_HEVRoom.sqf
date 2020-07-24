@@ -95,7 +95,7 @@ While {str (findDisplay 5600) != "No display"} do {
 	for "_i" from 0 to _countHEVs do {
 		private _hev = _console getVariable ["OPTRE_PodsLinkedToConsole",[]] select _i;
 
-		if (isNull (driver _hev)) then {
+		if (isNull (gunner _hev)) then {
 			_HEVMenuList lbSetPictureColor [_i, [1, 0, 0, 1]]; 
 			_HEVMenuList lbSetPictureColorSelected [_i, [1, 0, 0, 1]];
 		} else {

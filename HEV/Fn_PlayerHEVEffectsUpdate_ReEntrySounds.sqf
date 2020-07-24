@@ -18,7 +18,7 @@ params [
 	["_hev",objNull,[objNull]]
 ];
 
-if (typeOf _hev != "OPTRE_HEV" OR {!(alive (driver _hev))}) exitWith {};
+if (typeOf _hev != "OPTRE_HEV" OR {!(alive (gunner _hev))}) exitWith {};
 
 playSound "OPTRE_Sounds_ReEntryBuildUp";
 
@@ -32,12 +32,12 @@ playSound "OPTRE_Sounds_ReEntryBuildUp";
 		_stopSoundHeight = (_this getVariable "params") select 0;
 		_hev = (_this getVariable "params") select 1;
 
-		(alive (driver _hev)) AND {(getPosATLVisual _hev) select 2 > _stopSoundHeight}
+		(alive (gunner _hev)) AND {(getPosATLVisual _hev) select 2 > _stopSoundHeight}
 	},
 	{
 		_stopSoundHeight = (_this getVariable "params") select 0;
 		_hev = (_this getVariable "params") select 1;
 
-		((!alive (driver _hev)) OR ((getPosATLVisual _hev) select 2) < _stopSoundHeight)		
+		((!alive (gunner _hev)) OR ((getPosATLVisual _hev) select 2) < _stopSoundHeight)		
 	}
 ] call CBA_fnc_createPerFrameHandlerObject;

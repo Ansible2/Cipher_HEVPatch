@@ -84,7 +84,7 @@ _logic attachTo [_hev,[0,0,0]];
 	{
 		_hev = (_this getVariable "params") select 0;
 
-		(	!alive (driver _hev) OR {(getPosATL _hev) select 2 < 20} OR {(velocity _hev) select 2 isEqualTo 0}	)
+		(	!alive (gunner _hev) OR {(getPosATL _hev) select 2 < 20} OR {(velocity _hev) select 2 isEqualTo 0}	)
 	}
 
 ] call CBA_fnc_createPerFrameHandlerObject;

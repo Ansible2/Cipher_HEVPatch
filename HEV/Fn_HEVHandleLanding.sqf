@@ -25,13 +25,13 @@ params [
 	{((getPosATL (_this select 0)) select 2 < 1) OR {((getPosATL (_this select 0)) select 2 < (_this select 1)) AND ((velocity (_this select 0)) select 2 isEqualTo 0)} OR {(getPosASLW (_this select 0) select 2) <= 3}},
 	{
 		private _hev = param [0,objNull,[objNull]];
-		private _driver = driver _hev;
+		private _gunner = gunner _hev;
 
 		_hev setVariable ["OPTRE_HEV_Landed",true];
 		
 		playSound3d ["A3\Sounds_F\sfx\missions\vehicle_collision.wss", _hev,false, getPosASL _hev, 0.5, 1, 1000];
 		
-		if !(_driver in (call CBA_fnc_players)) then {
+		if !(_gunner in (call CBA_fnc_players)) then {
 			_hev lock false; 
 			[_hev, round (random 1), true] call OPTRE_fnc_HEVDoor;
 		} else {
@@ -54,7 +54,7 @@ params [
 			// should not be a global Variable, change when pods are added to local nameSpace Variable
 			if (!isNil "OPTRE_HEV_CONTROL_KDEH") then {
 				(findDisplay 46) displayRemoveEventHandler ["KeyDown", OPTRE_HEV_CONTROL_KDEH]; 
-				_driver removeEventHandler ["killed", OPTRE_HEV_CONTROL_KEH];
+				_gunner removeEventHandler ["killed", OPTRE_HEV_CONTROL_KEH];
 			};
 		};
 	},
@@ -65,24 +65,24 @@ params [
 _hev addEventHandler ["GetOut",{
 
 	private _hev = param [0,objNull,[objNull]];
-	private _driver = param [2,objNull,[objNull]];
+	private _gunner = param [2,objNull,[objNull]];
 	
 	// ai hev pilots (hopefully) wont hurt themselves if the pod jumps and they eject while it is rebounding in air
-	if !(_driver in (call CBA_fnc_players)) then {
+	if !(_gunner in (call CBA_fnc_players)) then {
 		[
 			{
 				params [
-					["_driver",objNull,[objNull]]
+					["_gunner",objNull,[objNull]]
 				];
 				
-				[_driver,true] remoteExecCall ["allowDamage",_driver];
-				[_driver] remoteExec ["unassignVehicle",_driver];
+				[_gunner,true] remoteExecCall ["allowDamage",_gunner];
+				[_gunner] remoteExec ["unassignVehicle",_gunner];
 			},
-			[_driver],
+			[_gunner],
 			3
 		] call CBA_fnc_waitAndExecute; 
 	} else {
-		[_driver,true] remoteExecCall ["allowDamage",_driver];
+		[_gunner,true] remoteExecCall ["allowDamage",_gunner];
 		resetCamShake;
 	};
 

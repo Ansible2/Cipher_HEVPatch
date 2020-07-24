@@ -14,7 +14,7 @@ Parameters:
 	
 	1: _units <ARRAY> - The units to teleport to drop pods
 	
-	2: _shipDeployment <STRING> - How to drop the units: Option are "Frigate Lowering Arm" OR "No Frigate". 
+	2: _shipDeployment <STRING> - How to drop the units: Option are "corvette" OR "No Frigate". 
 	
 	3: _launchDelay <NUMBER> - How long for pods to hang in seconds. >30 is required for engine start sound effects.
 	
@@ -53,7 +53,7 @@ Examples:
 		[
 			[0,0,0],
 			[player],
-			"Frigate Lowering Arm",
+			"corvette",
 			30,
 			2,
 			-1,
@@ -77,12 +77,12 @@ Author:
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
 
-if (hasInterface AND !isServer) exitWith {false};
+if (!isServer) exitWith {false};
 
 params	[
 	["_dropPosition",[0,0,0],[[]]],												
 	["_units",[],[[]]],																
-	["_shipDeployment","Frigate Lowering Arm",[""]],								
+	["_shipDeployment","corvette",[""]],								
 	["_launchDelay",30,[123]],														
 	["_randomXYVelocity",2,[123]],													 
 	["_launchSpeed",-1,[123]],														
@@ -121,31 +121,40 @@ if (!_manualDrop AND !_deleteChutesOnDetach) then {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Spawn HEVs //////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-private ["_allHEVs","_corvette"];
+private ["_allHEVs","_ship"];
 
 // spawn HEVs and get their info for the drop. Also create "frigate" or corvette
 _allHEVs = call {
-	if (_shipDeployment == "Frigate Lowering Arm") exitWith {
+	if (_shipDeployment == "corvette") exitWith {
 		_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
 
-		private _corvetteParts = [_dropPosition] call OPTRE_fnc_createCorvette;
-		_corvette = _corvetteParts select 0;
-		_corvette setVariable ["OPTRE_corvetteParts",_corvetteParts];
+		private _shipParts = [_dropPosition] call OPTRE_fnc_createCorvette;
+		_ship = _shipParts select 0;
+		_ship setVariable ["OPTRE_shipParts",_shipParts];
 		
-		private _return = [_corvette,_units] call OPTRE_fnc_SpawnHEVsFrigate;
+		private _return = [_ship,_units] call OPTRE_fnc_SpawnHEVsCorvette;
+
+		_return
+	};
+
+	if (_shipDeployment == "frigate") exitWith {
+		_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
+
+		_ship = "typeHere" createVehicle [0,0,0];		
+		private _return = [_ship,_units] call OPTRE_fnc_SpawnHEVsFrigate;
 
 		_return
 	};
 
 	if (_shipDeployment == "No Frigate") exitWith {
-		_corvette = objNull; // _corvette is null to avoid clean up script error
+		_ship = objNull; // _ship is null to avoid clean up script error
 
 		private _return = [_units,_startHeight] call OPTRE_fnc_SpawnHEVsNoFrigate;
 		
 		_return
 	};
 
-	if (_shipDeployment != "Frigate Lowering Arm" AND {_shipDeployment != "No Frigate"}) exitWith {
+	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Frigate"}) exitWith {
 		["Unsupported STRING entry for _shipDeployment parameter"] call BIS_fnc_error;
 		false
 	};
@@ -191,17 +200,17 @@ if (count _listOfPlayers < 1) then {
 	
 	{
 		[
-			{!isNull (driver (_this select 0))},
+			{!isNull (gunner (_this select 0))},
 			{
 				params [
 					["_hev",objNull,[objNull]],
 					["_launchIndex",0,[1]],
 					["_launchDelay",30,[1]]
 				];
-				private _driver = driver _hev;
+				private _gunner = gunner _hev;
 
-				if (_driver in (call CBA_fnc_players)) then {
-					[_launchIndex,_launchDelay,_driver] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_PlayTones",_driver];
+				if (_gunner in (call CBA_fnc_players)) then {
+					[_launchIndex,_launchDelay,_gunner] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_PlayTones",_gunner];
 				};
 			},
 			[_x,_forEachIndex,_launchDelay]
@@ -230,7 +239,7 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 			["_manualControl",0,[1]],
 			["_listOfPlayers",[],[[]]],
 			["_hevDropArmtmosphereStartHeight",3000,[1]],
-			["_corvette",objNull,[objNull]],
+			["_ship",objNull,[objNull]],
 			["_deleteFrigate",true,[true]],
 			["_lastPod",objNull,[objNull]],
 			["_HEVLaunchNumber",1,[1]]
@@ -239,16 +248,16 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 		{
 			[
 				{
-					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",driver (_this select 0)];
+					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner (_this select 0)];
 				},
-				[_x,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_manualControl,_listOfPlayers,_hevDropArmtmosphereStartHeight,_corvette,_deleteFrigate,_lastPod,_HEVLaunchNumber],
+				[_x,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_manualControl,_listOfPlayers,_hevDropArmtmosphereStartHeight,_ship,_deleteFrigate,_lastPod,_HEVLaunchNumber],
 				_forEachIndex * 0.35
 			] call CBA_fnc_waitAndExecute;
 		} forEach _hevArray;
 
 		[_thisType, _thisId] call CBA_fnc_removeEventHandler;
 	}, 
-	[_hevArray,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_manualControl,_listOfPlayers,_hevDropArmtmosphereStartHeight,_corvette,_deleteFrigate,_lastPod,_HEVLaunchNumber]
+	[_hevArray,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_manualControl,_listOfPlayers,_hevDropArmtmosphereStartHeight,_ship,_deleteFrigate,_lastPod,_HEVLaunchNumber]
 ] call CBA_fnc_addEventHandlerArgs;
 
 
@@ -269,7 +278,7 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 
 		_hevArray apply {
 			private _hev = _x;
-			[_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",driver _hev];
+			[_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _hev];
 		};
 	},
 	[_hevArray,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_hevArray select 0]
@@ -290,7 +299,7 @@ private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
 		
 		_hevArray apply {
 			private _hev = _x;
-			([_hev] + _this) remoteExecCall ["OPTRE_fnc_HEVChuteDeploy",driver _hev];
+			([_hev] + _this) remoteExecCall ["OPTRE_fnc_HEVChuteDeploy",gunner _hev];
 		};
 	},
 	[_hevArray,_hevArrayPlayer,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumbertring,_chuteArrayEventString],
@@ -353,7 +362,7 @@ private _chuteArrayEventID = [
 		
 		_hevArray apply {
 			private _hev = _x;
-			[_hev,_chuteDeployHeight] remoteExecCall ["OPTRE_fnc_HEVHandleLanding",driver _hev];
+			[_hev,_chuteDeployHeight] remoteExecCall ["OPTRE_fnc_HEVHandleLanding",gunner _hev];
 		};
 		
 
@@ -368,23 +377,23 @@ private _chuteArrayEventID = [
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // delete corvette
-if (!isNull _corvette AND {_deleteFrigate}) then {
+if (!isNull _ship AND {_deleteFrigate}) then {
 	
 	private _deleteFrigateString = ["OPTRE_HEV_deleteFrigateEvent",str _HEVLaunchNumber] joinString "_";
 	[
 		{missionNamespace getVariable [_this select 0,false]},
 		{
-			private _corvette = _this select 1;
+			private _ship = _this select 1;
 
-			if (isNil {_corvette getVariable "OPTRE_corvetteParts"}) then {
-				deleteVehicle _corvette;
+			if (isNil {_ship getVariable "OPTRE_shipParts"}) then {
+				deleteVehicle _ship;
 			} else {
-				(_corvette getVariable "OPTRE_corvetteParts") apply {
+				(_ship getVariable "OPTRE_shipParts") apply {
 					deleteVehicle _x;
 				};
 			};
 		},
-		[_deleteFrigateString,_corvette]
+		[_deleteFrigateString,_ship]
 	] call CBA_fnc_waitUntilAndExecute;
 };
 

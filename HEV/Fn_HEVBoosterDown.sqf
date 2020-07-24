@@ -32,7 +32,7 @@ _fire attachto [_hev,[0,-0.2,0.6]];
 private _boosterLights = [_fire,_light];
 
 
-if ((driver _hev) in (call CBA_fnc_players)) then {
+if ((gunner _hev) in (call CBA_fnc_players)) then {
         [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_manualControl,_hev,_hevDropArmtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
     } else {
         [_hev,[(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed]] remoteExecCall ["setVelocity",_hev];
@@ -43,7 +43,7 @@ if (!isNull _frigate AND {_deleteFrigate} AND {_hev isEqualTo _lastPod}) then {
         {
             params ["_HEVLaunchNumber"];
 
-            private _deleteFrigateString = ["OPTRE_HEV_deleteFrigateEvent",str _HEVLaunchNumber] joinString "_";
+            private _deleteFrigateString = ["OPTRE_HEV_deleteShipEvent",str _HEVLaunchNumber] joinString "_";
 
             missionNamespace setVariable [_deleteFrigateString,true,[0,2] select isMultiplayer];
         },
