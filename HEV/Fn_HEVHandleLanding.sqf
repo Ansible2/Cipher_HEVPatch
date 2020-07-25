@@ -27,6 +27,12 @@ params [
 		private _hev = param [0,objNull,[objNull]];
 		private _gunner = gunner _hev;
 
+		private _hevPosition = getPosATLVisual _hev;
+		private _hevVectorDir = vectorDirVisual _hev;
+		private _hevVectorUp = vectorUpVisual _hev;
+		_hev setPosATL [_hevPosition select 0,_hevPosition select 1,0];
+		_hev setVectorDirAndUp [_hevVectorDir,_hevVectorUp];
+
 		_hev setVariable ["OPTRE_HEV_Landed",true];
 		
 		playSound3d ["A3\Sounds_F\sfx\missions\vehicle_collision.wss", _hev,false, getPosASL _hev, 0.5, 1, 1000];

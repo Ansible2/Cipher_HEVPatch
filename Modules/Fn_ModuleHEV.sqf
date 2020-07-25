@@ -2,7 +2,7 @@ _logic = param [0,objNull,[objNull]];	// Argument 0 is module logic.
 _units = param [1,[],[[]]];				// Argument 1 is list of affected units (affected by value selected in the 'class Units' argument))
 _activated = param [2,true,[true]];		// True when the module was activated, false when it's deactivated (i.e., synced triggers are no longer active)
 
-_shipDeployment  = _logic getVariable ["shipDeployment","Frigate Lowering Arm"];
+_shipDeployment  = _logic getVariable ["shipDeployment","Corvette"];
 _LaunchDelay  = _logic getVariable ["LaunchDelay",5];
 _randomXYVelocity  = _logic getVariable ["randomXYVelocity",1];
 _launchSpeed = _logic getVariable ["launchSpeed",-250];

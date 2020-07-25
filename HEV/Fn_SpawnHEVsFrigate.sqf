@@ -7,7 +7,6 @@ Description:
 	Modifications: Adapted for use on dedicated servers, improved performance/readability
 
 Parameters:
-
 	0: _ship <OBJECT> - The ship to attach the pods to
 	1: _units <ARRAY> - The units to teleport into the pods
 
@@ -35,6 +34,13 @@ params [
 	["_ship",objNull,[objNull]],
 	["_units",[],[[]]]
 ];
+
+// prepare return information
+private _hevArray = [];			
+private _hevArrayPlayer = [];	
+private _hevArrayAi = [];		
+private _listOfPlayers = [];	 
+private _listOfAI = []; 
 
 // these are the possible vectorDir (relative to the ship's model) for the pods
 /// they are (anatomically) left and right side of the ship respectively;
@@ -69,7 +75,7 @@ private _countHEVsLeft = 0;
 			private _shipSideOffset = [-50,50] select _leftOrRightOfShip;
 			private _countOfSide = [_countHEVsLeft,_countHEVsRight] select _leftOrRightOfShip;
 
-			_hev attachTo [_ship,[_shipSideOffset,-20 + (_countOfSide * 5),-14]];
+			_hev attachTo [_ship,[_shipSideOffset,-20 + (_countOfSide * 6),-14]];
 
 			if (_leftOrRightOfShip) then {
 				_countHEVsRight = _countHEVsRight + 1;
@@ -79,7 +85,7 @@ private _countHEVsLeft = 0;
 
 
 			// reTranslating the left or right relative vectors back to world based upon the current model
-			private _vectorDirRelative = _ship vectorModelToWorld (_leftOrRightOfShip select _shipRelativeDirVectors);
+			private _vectorDirRelative = _ship vectorModelToWorld (_shipRelativeDirVectors select _leftOrRightOfShip);
 			_hev setVectorDirAndUp [_vectorDirRelative,_shipRelativeUpVector];
 			
 			_hev lock true;

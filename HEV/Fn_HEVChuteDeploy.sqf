@@ -33,7 +33,7 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
             [_hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_GroundAlarm;
         };
 
-        [_hev,[0,0,30]] remoteExecCall ["setVelocityModelSpace",_hev];
+        [_hev,[0,0,45]] remoteExecCall ["setVelocityModelSpace",_hev];
 
         _chute animateSource ["wing1_rotation",0];
         _chute animateSource ["wing2_rotation",0];

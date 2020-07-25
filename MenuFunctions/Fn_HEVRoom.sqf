@@ -1,3 +1,29 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HEVRoom
+
+Description:
+	Opens/creates the dialog used for selecting the drop parameters for HEVs
+	
+	Modifications: Optimized code, updated commands, changed for support of Frigate and Corvette, removed manual control selection, added comments
+
+Parameters:
+	0: _console <OBJECT> - The control panel
+	1: _highestCard <NUMBER> - Clearance level in OPTRE
+
+Returns:
+	Nothing
+
+Examples:
+    (begin example)
+
+		[myConsole,10] call OPTRE_fnc_HEVRoom;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 disableSerialization;
 
 params [
@@ -75,7 +101,19 @@ _linkedPods apply {
 	_15 lbSetValue [_i, _x];
 };
 
-[_10,_11,_12,_13,_14,_15] apply {
+[0,1,2] apply {
+	_i = _16 lbAdd (format ["Deployment: %1",
+		(switch _x do {
+				case 0: {"Corvette"};
+				case 1: {"Frigate"}; 
+				case 2: {"No Ship"};  
+			}
+		)]);
+
+	_16 lbSetValue [_i, _x];
+};
+
+[_10,_11,_12,_13,_14,_15,_16] apply {
 	_x lbSetCurSel 0;
 };
 
