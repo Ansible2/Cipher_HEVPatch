@@ -1,41 +1,33 @@
-/* 
-	OPTRE_Fnc_HEVDoor
-	
-	Description: Can be used to open the HEVs door, or eject it, can also be to make ai or players eject from vehicle afterwards. 
-	
-	Author: Big_Wilk
-	
-	Type: Spawn
-	
-	Return: None
-	
-	Prams:
-	0: Object: HEV
-	1: Number: 0 = emergency eject door, 1 = open door
-	2: Bool: true forces the HEV gunner to leave the vehicle, false does nothing
-	
-	Example 1:
-	0 = [vehicle player, 0, true] spawn OPTRE_Fnc_HEVDoor;
-	Result: Door ejects, Player exits hev.
-	
-	Example 1:
-	0 = [vehicle player, 1, false] spawn OPTRE_Fnc_HEVDoor;
-	Result: Door opens, Player does not exits hev.
-	
-*/
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HEVDoor
 
-/*
-private ["_hev","_mode","_eject"];
+Description:
+	Performs desired action for an HEVs door.
+	(eject it or just open it)
 
-_hev = vehicle ([_this,0,objNull] call BIS_fnc_param);
-_mode = [_this,1,0] call BIS_fnc_param;
-_eject = [_this,2,false] call BIS_fnc_param;
-*/
+Parameters:
+	0: _hev <OBJECT> - The HEV to affect the changes on.
+    1: _mode <NUMBER> - 0 to eject door, 1 to open
+    2: _ejectGunner <BOOL> - Should the player be automatically kicked out of HEV?
 
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[myHEV,0,true] call OPTRE_fnc_HEVDoor;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params [
 	["_hev",objNull,[objNull]],
 	["_mode",0,[1]],
-	["_eject",true,[true]]
+	["_ejectGunner",true,[true]]
 ];
 
 null = switch _mode do {
@@ -80,7 +72,7 @@ null = switch _mode do {
 };
 
 
-if (_eject) then {
+if (_ejectGunner) then {
 	
 	_hev setVelocity [0,0,0];
 

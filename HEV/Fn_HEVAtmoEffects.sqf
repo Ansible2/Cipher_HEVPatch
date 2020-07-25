@@ -1,3 +1,33 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HEVAtmoEffects
+
+Description:
+	Creates the burning effect of atmospheric entry on a local machine. 
+    Then remoteExec's "OPTRE_fnc_PlayerHEVEffectsUpdate_Light" on other players in drop to sync effect.
+    
+    This is automatically called in the series of functions from "OPTRE_fnc_HEV".
+
+Parameters:
+	0: _hev <OBJECT> - The HEV to play the effect on.
+    1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
+    2: _listOfPlayers <ARRAY> - The list of players participating in drop.
+    3: _hevDropArmtmosphereEndHeight <NUMBER> - The height at which effects will end.
+    4: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which effects will start.
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[playerHEV_1,[playerHEV_1,playerHEV_2],[player_1,player_2],2000,3000] call OPTRE_fnc_HEVAtmoEffects;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params [
     ["_hev",objNull,[objNull]],
     ["_hevArrayPlayer",[],[[]]],

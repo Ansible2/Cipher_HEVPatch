@@ -1,39 +1,50 @@
-/* 
-	OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown
-	
-	Description: Function is designed to be executed only from inside of the HEV scripts, do not execute it directly.
-	
-	Author: Big_Wilk, modified by Cipher
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown
 
-	Modifications: Adapted for use on dedicated servers, patched several bugs, improved performance/readability, moved into unscheduled environment
-	
-	Return: none
-	
-	Type: call
-*/
+Description:
+	Handles the playing of drop sounds to the player, adds camera shake.
+	This is local to a player and only should be executed on players not AI HEVs
+
+	Modifications: Optimized function, moved into unscheduled environment, reworked eventHandlers, fixed bugs
+
+Parameters:
+	0: _randomXVelocity <NUMBER> - The maximum X deviation of velocity.
+    1: _randomYVelocity <NUMBER> - The maximum Y deviation of velocity.
+	2: _launchSpeed <NUMBER> - The downward starting velocity of the HEV (negative numbers only).
+    3: _manualControlState <ANY> - DEPRECIATED ENTRY
+	4: _hev <OBJECT> - The HEV to affect the changes on.
+    5: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which the HEV will play its enter atmo effects (ATL).
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[1,1,-1,[],myHEV,3000] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 if !(hasInterface) exitWith {};
 
 params [
-	["_randomXYVelocity",1,[1]],
-	["_randomXYVelocity2",1,[1]],
-	["_launchSpeed",1,[1]],
-	["_manualControlState",0,[1]],
+	["_randomXVelocity",1,[1]],
+	["_randomYVelocity",1,[1]],
+	["_launchSpeed",-1,[1]],
+	["_manualControlState",0,[]],
 	["_hev",objNull,[objNull]],
 	["_hevDropArmtmosphereStartHeight",3000,[1]]
 ];
 
 if (typeOf _hev != "OPTRE_HEV") exitWith {};
 
-
-_arm = attachedTo _hev;
-_arm enableSimulation false;
-_arm disableCollisionWith _hev;
-deleteVehicle _arm;
 detach _hev;
 
-
-//_hev setVelocity [_randomXYVelocity,_randomXYVelocity2,_launchSpeed]; 
-[_hev,[_randomXYVelocity,_randomXYVelocity2,_launchSpeed]] remoteExecCall ["setVelocity",_hev];
+[_hev,[_randomXVelocity,_randomYVelocity,_launchSpeed]] remoteExecCall ["setVelocity",_hev];
 
 //playSound "OPTRE_Sounds_Detach";
 playSound "OPTRE_Sounds_DetachOLD";
@@ -53,9 +64,11 @@ playSound ["OPTRE_Sounds_Engine",true];
 	[_hev,_hevDropArmtmosphereStartHeight]
 ] call CBA_fnc_waitUntilAndExecute;
 
+/*
 if (_manualControlState > 0) then {
 	[_manualControlState] call OPTRE_fnc_HEVControls;
 };
+*/
 
 // this logic is used to play the wind sound using say2D so that the logic can be deleted at anytime, stopping the sound
 private _logicCenter = createCenter sideLogic;

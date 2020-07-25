@@ -1,3 +1,28 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_playerHEVEffectsupdate_PlayTones
+
+Description:
+	Plays tones just before HEV is boosted downard.
+	Should only be executed on players, not AI.
+
+Parameters:
+	0: _launchIndex <NUMBER> - The HEV's index in the launch order (0 being the first).
+	1: _launchDelay <NUMBER> - The delay time before drop sequence starts.
+	2: _gunner <OBJECT> - The HEV's gunner (pilot).
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[0,30,myODST] call OPTRE_fnc_playerHEVEffectsupdate_PlayTones;
+
+    (end)
+
+Author:
+	Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 if !(hasInterface) exitWith {};
 
 params [

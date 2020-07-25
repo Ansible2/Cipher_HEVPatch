@@ -1,20 +1,30 @@
-/*
-	OPTRE_fnc_HandleHEVLanding
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HandleHEVLanding
 
-	Description: Handles landing of HEVs, make sets drive vunrable to damaged after exit creates effects on landing. 
+Description:
+	Handles HEV's final approach to the ground. Removes actions and destroys variables relavent to drop. 
+	Generally the end of the line for the scripts.
 
 	Modifications: Optimized function, moved into unscheduled environment, reworked eventHandlers, fixed bugs
 
-	Author: Big_Wilk; Modifiied by Cipher
-	
-	Return: BOOL
-	
-	Params: 
-	0: HEv <Object>
-	1: Chute deployment height (ATL) <Number>
+Parameters:
+	0: _hev <OBJECT> - The HEV to affect the changes on.
+    1: _chuteDeployHeight <NUMBER> - The height which the HEV deployed its chute (ATL).
 
-*/
+Returns:
+	BOOL
 
+Examples:
+    (begin example)
+
+		[myHEV,,1000] call OPTRE_fnc_HandleHEVLanding;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params [
 	["_hev",objNull,[objNull]],
 	["_chuteDeployHeight",1000,[123]]

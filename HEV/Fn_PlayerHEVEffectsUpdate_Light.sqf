@@ -1,17 +1,32 @@
-/* 
-	OPTRE_fnc_PlayerHEVEffectsUpdate_Light
-	
-	Description: Function is designed to be executed only from inside of the HEV scripts, do not execute it directly.
-	
-	Author: Big_Wilk, modified by Cipher
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_PlayerHEVEffectsUpdate_Light
+
+Description:
+	Plays an alarm sound when HEV is rapidly approaching the ground.
 	
 	Modifications: Adapted for use on dedicated servers, patched several bugs, improved performance/readability
-	
-	Return: none
-	
-	Type: call
-*/
 
+Parameters:
+	0: _lightEffect <NUMBER> - Denotes the type of effect.
+		0 = initial thruster effect when boosting down (Depreciated).
+		1 = reEntry fire effect.
+	1: _hev <OBJECT> - The HEV to affect.
+	2: _light <OBJECT> - The actual light (particle) object.
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[myLightEffectType,myHEV,myParticleObject] call OPTRE_fnc_PlayerHEVEffectsUpdate_Light;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params[
 	["_lightEffect",1,[1]],
 	["_hev",objNull,[objNull]],

@@ -1,3 +1,25 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_playerHEVEffectsupdate_GroundAlarm
+
+Description:
+	Plays an alarm sound when HEV is rapidly approaching the ground.
+
+Parameters:
+	0: _hev <OBJECT> - The HEV to affect.
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[myHEV] call OPTRE_fnc_playerHEVEffectsupdate_GroundAlarm;
+
+    (end)
+
+Author:
+	Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 if !(hasInterface) exitWith {};
 
 params [

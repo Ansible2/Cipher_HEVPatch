@@ -1,16 +1,29 @@
-/* 
-	OPTRE_fnc_PlayerHEVEffectsUpdate_Chute
-	
-	Description: Function is designed to be executed only from inside of the HEV scripts, do not execute it directly.
-	
-	Author: Big_Wilk, modified by Cipher
-	
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_PlayerHEVEffectsUpdate_Chute
+
+Description:
+	Adds detach sound and camera shake for players. Does not need to be exec'd on AI.
+
 	Modifications: Adapted for use on dedicated servers, patched several bugs, improved performance/readability
-	
-	Return: none
-	
-	Type: call
-*/
+
+Parameters:
+	0: _hev <OBJECT> - The HEV to update.
+    1: _chute <OBJECT> - The Chute attached to the HEV.
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[myHEV,myHEVsChute] call OPTRE_fnc_PlayerHEVEffectsUpdate_Chute;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 
 if (!hasInterface) exitWith {};
 

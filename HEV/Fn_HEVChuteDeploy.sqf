@@ -1,3 +1,49 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HEVChuteDeploy
+
+Description:
+	Creates the shooting down effect for the HEV when dropping the pod.
+    Also accelerates the pod.
+    
+    This is automatically called in the series of functions from "OPTRE_fnc_HEV".
+
+Parameters:
+	0: _hev <OBJECT> - The HEV being dropped.
+    1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
+    2: _chuteDeployHeight <NUMBER> - The height to deploy chute and slow pod.
+    3: _chuteDetachHeight <NUMBER> - The height to detach chute.
+    4: _deleteChutesOnDetach <BOOL> - Automatically delete chutes after detach?
+    5: _lastPod <OBJECT> - The last pod to be dropped from ship.
+    
+    6: _handleLandingEventString <STRING> - A unique string for this drop's handle landing.
+        This is automatically permuted up to function chain as "OPTRE_HEV_handleLanding" + (the launch number)
+    
+    7: _chuteArrayEventString <STRING> - Another unique string like _handleLandingEventString.
+        This is "OPTRE_HEV_chuteArray" + (the launch number).
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[
+            playerHEV_1,
+            [playerHEV_1,playerHEV_2],
+            1000,
+            500,
+            true,
+            playerHEV_2,
+            "OPTRE_HEV_handleLanding1",
+            "OPTRE_HEV_chuteArray1"
+        ] call OPTRE_fnc_HEVChuteDeploy;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params [
     ["_hev",objNull,[objNull]],
 	["_hevArrayPlayer",[],[[]]],

@@ -1,16 +1,32 @@
-/* 
-	OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds
-	
-	Description: Function is designed to be executed only from inside of the HEV scripts, do not execute it directly.
-	
-	Author: Big_Wilk, modified by Cipher
-	
-	Modifications: Adapted for use on dedicated servers, patched several bugs, improved performance/readability, moved into unscheduled environment
-	
-	Return: none
-	
-	Type: Call
-*/
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds
+
+Description:
+	Starts reEntry sounds and then loops in engine hum while drop is in progress.
+	Eventually kills the sound with a smooth transition once the stop height is reached
+
+	Modifications: Adapted for use on dedicated servers, patched several bugs, improved performance/readability, moved into unscheduled environment,
+		added engine hum and developed loop kill.
+
+Parameters:
+	0: _stopSoundHeight <NUMBER> - At what height (ATL) will the sound loops cease.
+		Put this a good bit above the terrain for the best natural effect. (default 40)
+	1: _hev <OBJECT> - The HEV whose gunner we will play effects to.
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[40,myHEV] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 if !(hasInterface) exitWith {};
 
 params [

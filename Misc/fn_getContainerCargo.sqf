@@ -6,11 +6,12 @@ Description:
 	Exact ammo counts will be preserved even inside of an item such as magazines inside of a vest or backpack.
 
 Parameters:
-
-	0: _primaryContainer <OBJECT> - The container to save the cargo of
+	0: _primaryContainer <OBJECT> - The container to save the cargo of.
 
 Returns:
-	_totalCargo <ARRAY> - Formatted array of all items in cargo space of a container. Used with OPTRE_fnc_addContainerCargo. Will return [] if no cargo is present
+	_totalCargo <ARRAY> - Formatted array of all items in cargo space of a container. 
+		Used with OPTRE_fnc_addContainerCargo. 
+		Will return [] if no cargo is present
 
 Examples:
     (begin example)

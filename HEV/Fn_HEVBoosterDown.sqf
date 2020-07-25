@@ -1,11 +1,59 @@
+/* ----------------------------------------------------------------------------
+Function: OPTRE_fnc_HEVBoosterDown
+
+Description:
+	Creates the shooting down effect for the HEV when dropping the pod.
+    Also accelerates the pod.
+    
+    This is automatically called in the series of functions from "OPTRE_fnc_HEV".
+
+Parameters:
+	0: _hev <OBJECT> - The HEV being dropped.
+    1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
+    2: _randomXYVelocity <NUMBER> - The deviation by which the pod should randomly drift on the horixontal axis
+    3: _launchSpeed <NUMBER> - Downward velocity to start at. (negative numbers only)
+    4: _manualControl <ANY> - DEPRECIATED ENTRY
+    5: _listOfPlayers <ARRAY> - The list of players participating in drop.
+    6: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which re-entry effects will start.
+    7: _ship <OBJECT> - The ship from which the pod dropped.
+    8: _deleteShip <BOOL> - Should the ship be deleted after drop.
+    9: _lastPod <OBJECT> - The last pod to be dropped from ship.
+    10: _HEVLaunchNumber <NUMBER> - The unique drop number. (crucial to certain events to fire properly)
+
+Returns:
+	NOTHING
+
+Examples:
+    (begin example)
+
+		[
+            playerHEV_1,
+            [playerHEV_1,playerHEV_2],
+            2,
+            -1,
+            [],
+            [player_1,player_2],
+            3000,
+            myShip,
+            true,
+            playerHEV_2,
+            1
+        ] call OPTRE_fnc_HEVBoosterDown;
+
+    (end)
+
+Author:
+	Big_Wilk,
+	Modified by: Ansible2 // Cipher
+---------------------------------------------------------------------------- */
 params [
     ["_hev",objNull,[objNull]],
     ["_hevArrayPlayer",[],[[]]],
     ["_randomXYVelocity",1,[1]],
-    ["_launchSpeed",1,[1]],
-    ["_manualControl",0,[1]],
+    ["_launchSpeed",-1,[1]],
+    ["_manualControl",0,[]],
     ["_listOfPlayers",[],[[]]],
-    ["_hevDropArmtmosphereStartHeight",3000,[1]], // unused as of 20200312
+    ["_hevDropArmtmosphereStartHeight",3000,[1]],
     ["_ship",objNull,[objNull]],
     ["_deleteShip",true,[true]],
     ["_lastPod",objNull,[objNull]],
@@ -27,9 +75,9 @@ private _boosterLights = [_fire,_light];
 
 
 if ((gunner _hev) in (call CBA_fnc_players)) then {
-        [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_manualControl,_hev,_hevDropArmtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
-    } else {
-        [_hev,[(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed]] remoteExecCall ["setVelocity",_hev];
+    [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_manualControl,_hev,_hevDropArmtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
+} else {
+    [_hev,[(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed]] remoteExecCall ["setVelocity",_hev];
 };
 
 if (!isNull _ship AND {_deleteShip} AND {_hev isEqualTo _lastPod}) then {
