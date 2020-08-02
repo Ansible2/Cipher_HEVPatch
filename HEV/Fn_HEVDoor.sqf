@@ -90,4 +90,3 @@ if (_ejectGunner) then {
 		1
 	] call CBA_fnc_waitAndExecute;
 };
-

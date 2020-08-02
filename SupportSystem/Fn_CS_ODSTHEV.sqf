@@ -79,7 +79,7 @@ _unitsInGroup apply {
 	[
 		_pos,
 		_unitsInGroup,
-		"No Frigate",
+		"No frigate",
 		5,
 		1,
 		1,

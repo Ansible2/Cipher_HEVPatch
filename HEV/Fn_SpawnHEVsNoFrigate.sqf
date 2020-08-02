@@ -97,8 +97,6 @@ private _fn_OPTRESpawnHEVs = {
 			_listOfAI pushBack _unit; 
 			_hevArrayAi pushBack _hev;
 		};
-
-		_hev enableSimulationGlobal false;
 	};
 };
 

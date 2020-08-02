@@ -14,7 +14,7 @@ Parameters:
 	
 	1: _units <ARRAY> - The units to teleport to drop pods
 	
-	2: _shipDeployment <STRING> - How to drop the units: Option are "frigate", "corvette", OR "No Frigate". 
+	2: _shipDeployment <STRING> - How to drop the units: Options are "frigate", "corvette", OR "No Frigate". 
 	
 	3: _launchDelay <NUMBER> - How long for pods to hang in seconds. >30 is required for engine start sound effects.
 	
@@ -107,7 +107,7 @@ if ({alive _x} count _units < 1) exitWith {false};
 if (_randomXYVelocity < 2) then {_randomXYVelocity = 2}; 
 
 // manual controls are not operational, used to disable
-if (_manualControl != 0) then {
+if !(_manualControl isEqualTo 0) then {
 	_manualControl = 0;
 };
 
@@ -239,7 +239,7 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 			["_hevArrayPlayer",[],[[]]],
 			["_randomXYVelocity",1,[1]],
 			["_launchSpeed",1,[1]],
-			["_manualControl",0,[1]],
+			["_manualControl",0,[]],
 			["_listOfPlayers",[],[[]]],
 			["_hevDropArmtmosphereStartHeight",3000,[1]],
 			["_ship",objNull,[objNull]],

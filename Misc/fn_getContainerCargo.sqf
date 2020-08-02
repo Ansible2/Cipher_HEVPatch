@@ -2,8 +2,8 @@
 Function: OPTRE_fnc_getContainerCargo
 
 Description:
-	Saves the cargo of a container in a formatterd array to be used with OPTRE_fnc_addContainerCargo for copying cargos of containers.
-	Exact ammo counts will be preserved even inside of an item such as magazines inside of a vest or backpack.
+	Saves the cargo of a container in a formatterd array to be used with OPTRE_fnc_addContainerCargo for copying cargo of containers.
+	Exact ammo counts will be preserved even inside of an item, such as magazines inside of a vest or backpack.
 
 Parameters:
 	0: _primaryContainer <OBJECT> - The container to save the cargo of.
