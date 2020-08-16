@@ -89,5 +89,6 @@ for "_i" from 0 to _timeTotal do {
 			0.9
 		] call CBA_fnc_waitAndExecute;
 	},
-	[_text,_listOfPlayers,_countDownDoneEventString]
+	[_text,_listOfPlayers,_countDownDoneEventString],
+	180
 ] call CBA_fnc_waitUntilAndExecute;

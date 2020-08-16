@@ -8,7 +8,8 @@ class CfgPatches
 		requiredAddons[]=
 		{
 			"OPTRE_FunctionsLibrary",
-			"OPTRE_Corvette",
+			//"OPTRE_Corvette",
+			"OPTRE_modules",
 			"OPTRE_Core",
 			"CBA_main"
 		};
@@ -25,6 +26,7 @@ class CfgFunctions
 				file = "Cipher_HEVPatch\SupportSystem\Fn_CS_ODSTHEV.sqf";
 			};
 		};
+	/*
 		class CorvetteHEVs
 		{
 			file = "Cipher_HEVPatch\CorvetteHevs";
@@ -35,6 +37,7 @@ class CfgFunctions
 			class corvetteHEVLaunch
 			{};
 		};
+	*/
 		class HEV
 		{
 			class createCorvette
@@ -145,6 +148,10 @@ class CfgFunctions
 			{
 				file="Cipher_HEVPatch\Misc\fn_getContainerCargo.sqf";
 			};
+			class playSound3D
+			{
+				file="Cipher_HEVPatch\Misc\fn_playSound3D.sqf";
+			};
 		};
 		class Modules
 		{
@@ -164,10 +171,10 @@ class CfgSounds
 {
 	sounds[] =
 	{
-		"OPTRE_Sounds_HEV_Tone",
-		"OPTRE_HEV_GroundAlarm",
-		"OPTRE_Sounds_HEV_EngineStart",
-		"OPTRE_Sounds_HEV_Interior_01"
+		"OPTRE_sounds_HEV_Tone",
+		"OPTRE_sounds_HEV_GroundAlarm",
+		"OPTRE_sounds_HEV_EngineStart",
+		"OPTRE_sounds_HEV_interiorDropLoop"
 	};
 	class OPTRE_Sounds_HEV_Tone
 	{
@@ -208,13 +215,13 @@ class CfgSounds
 		author = "Cipher // Ansible2";
 		titles[] = {};
 	};	
-	class OPTRE_Sounds_HEV_Interior_01
+	class OPTRE_sounds_HEV_interiorDropLoop
 	{
 		dlc = "HEV Patch";
-		name = "[OPTRE] HEV Interior 01";
+		name = "[OPTRE] Corvette HEV Drop Engine Loop";
 		sound[] =
 		{
-			"Cipher_HEVPatch\Sounds\OPTRE_HEV_InteriorLoop_01.ogg",
+			"Cipher_HEVPatch\Sounds\OPTRE_HEV_interiorDropLoop.ogg",
 			1,
 			1
 		};
@@ -223,74 +230,203 @@ class CfgSounds
 	};
 };
 
-class CfgVehicles
+class cfgVehicles 
 {
-	class House_F;
-	/*
-	class NonStrategic;
-	class ThingX;
-	class House_F;
-	class Land;
-	class LandVehicle : Land
+	class Module_F;
+	class Module_OPTRE_HEV: Module_F
 	{
-	};
-	*/
-	class OPTRE_UNSC_Drake : House_F
-	{/*
-		dlc = "OPTRE";
-		scope = 2;
-		scopeCurator = 2;
-		vehicleClass = "OPTRE_UNSC_corvette_class";
-		displayName = "UNSC Drake Class Corvette";
-		model = "\OPTRE_Corvette\editorObject.p3d";
-		author = "Article 2 Studios";
-		editorCategory = "OPTRE_EditorCategory_Corvette";
-		editorSubcategory = "OPTRE_EditorSubcategory_Corvette_Pieces";
-		class Eventhandlers
+		scope=2;
+		displayName="HEV Module";
+		icon="\OPTRE_Modules\data\picture\Icon_OPTRE.paa";
+		category="OPTRE_HEV";
+		function="OPTRE_fnc_ModuleHEV";
+		functionPriority=99;
+		isGlobal=0;
+		isTriggerActivated=1;
+		author="Article 2 Studios";
+		is3DEN=0;
+		class Arguments
 		{
-			init = "_this call OPTRE_fnc_Drake_Init";
-			AttributesChanged3DEN = "_this call OPTRE_fnc_Drake_EdenInit";
-			Dragged3DEN = "_this call OPTRE_fnc_Drake_PosUpdate";
-			RegisteredToWorld3DEN = "_this call OPTRE_fnc_Drake_EdenInit";
-			UnregisteredFromWorld3DEN = "_this call OPTRE_fnc_Drake_EdenDelete";
-		};
-	*/
-		class Attributes
-		{
-			class OPTRE_Drake_LoadHEVSripts
-			{/*
-				control = "combo";
-				property = "OPTRE_Drake_LoadHEVSripts";
-				displayName = "Basic HEV Script";
-				description = "This combo has three values.";
-			*/	tooltip = "Options: Activate the traditional HEV scripts, have none activated, or have the advanced (player controlled) scripts active.";
-				expression = "_this setVariable ['%s', _value, true]; if ((_this getVariable [""OPTRE_Drake_LoadHEVSripts"", 0]) < 1) then {0 = [_this, false] execVM ""Cipher_HEVPatch\HEV_Scripts\HEV.sqf"";};";
-				
-				defaultValue = 0;
-			/*	typeName = "NUMBER";
-				condition = "1";
-			*/	
-				class Values
+			class shipDeployment
+			{
+				displayName="Deployment Mode";
+				description="This controls the drop scene for the players. The drop will always be directly above the module.";
+				defaultValue="Corvette";
+				typeName="STRING";
+				class values
 				{
-					class off
+					class n1
 					{
-						name = "Deactivate HEV System";
-						value = 0;
+						name="Deploy from Corvette";
+						value="Corvette";
+						default=1;
 					};
-					class on1
+					class n2
 					{
-						name = "Activate HEV System";
-						value = 1;
+						name="Deploy without ship";
+						value="No Ship";
 					};
-					class on2
+					class n3
 					{
-						name = "Activate Advanced HEV System";
-						value = 2;
+						name="Deploy from Frigate";
+						value="Frigate";
 					};
 				};
-			
 			};
-			
+			class LaunchDelay
+			{
+				displayName="Count Down Timer";
+				description="This is the time that the HEVs will be hanging waiting until drop.";
+				defaultValue="30";
+				typeName="NUMBER";
+			};
+			class randomXYVelocity
+			{
+				displayName="Randomised X/Y Velocity";
+				description="Random drift of pods on the horizontal axis. This must be at least 2 (otherwise the script will set it to 2) to minimize pods hitting each other.";
+				defaultValue="2";
+				typeName="NUMBER";
+			};
+			class launchSpeed
+			{
+				displayName="Down Velocity On Launch";
+				description="A negative value of how fast the pods descend. Should keep at -1.";
+				defaultValue="-1";
+				typeName="NUMBER";
+			};
+			class manualControl
+			{
+				displayName="Player Control Of HEV";
+				description="Depreciated Entry. No longer in use";
+				defaultValue=1;
+				typeName="NUMBER";
+				class values
+				{
+					class n1
+					{
+						name="Empty";
+						value=0;
+					};
+					class n2
+					{
+						name="Empty";
+						value=1;
+						default=1;
+					};
+				};
+			};
+			class startHeight
+			{
+				displayName="STAGE1: Start Height";
+				description="Height that the pods will drop from. Recommend above 5000m";
+				defaultValue="5000";
+				typeName="NUMBER";
+			};
+			class hevDropArmtmosphereStartHeight
+			{
+				displayName="STAGE2A: Atmospheric Entry Height";
+				description="At what height to engage the atmo entry fire effects. The difference between this and the start hieight shouldn't be more then 2000";
+				defaultValue="3000";
+				typeName="NUMBER";
+			};
+			class hevDropArmtmosphereEndHeight
+			{
+				displayName="STAGE2B: End Entry Height";
+				description="At what height to end the entry atmo effects.";
+				defaultValue="2000";
+				typeName="NUMBER";
+			};
+			class chuteDeployHeightHeight
+			{
+				displayName="STAGE3A: Chute Deployment Height";
+				description="Self explanitory.";
+				defaultValue="1000";
+				typeName="NUMBER";
+			};
+			class chuteDetachHeight
+			{
+				displayName="STAGE3B: Chute Detach Height";
+				description="Self explanitory.";
+				defaultValue="500";
+				typeName="NUMBER";
+			};
+			class boasterHeight
+			{
+				displayName="STAGE4: Booster Up Height";
+				description="Depreciated entry. No longer in use.";
+				defaultValue="0";
+				typeName="NUMBER";
+			};
+			class deleteFrigate
+			{
+				displayName="Delete Ship";
+				description="If spawning with a ship, should it be deleted after drop?";
+				defaultValue=1;
+				typeName="BOOL";
+				class values
+				{
+					class n1
+					{
+						name="Delete Ship";
+						value=1;
+						default=1;
+					};
+					class n2
+					{
+						name="Dont Delete Ship";
+						value=0;
+					};
+				};
+			};
+			class deleteChutes
+			{
+				displayName="Delete Chutes After Detach";
+				description="Should the chutes auto delete upon detach or be added to the cleanup module?";
+				defaultValue=1;
+				typeName="BOOL";
+				class values
+				{
+					class n1
+					{
+						name="Add Chutes To HEV CleanUp Module";
+						value=0;
+						default=1;
+					};
+					class n2
+					{
+						name="Delete Chutes On Detach";
+						value=1;
+					};
+				};
+			};
+			class deleteHEVafter
+			{
+				displayName="HEVs Can Be Delete After";
+				description="If the cleanup module is present, HEVs will be deleted after X amount of seconds.";
+				defaultValue="600";
+				typeName="NUMBER";
+			};
 		};
 	};
 };
+
+
+class OPTRE_UNSCMENU_RscButton;
+class OPTRE_HEVPanel
+{
+	class controls
+	{
+		class OPTRE_UNSCMENU_RscButton_1602: OPTRE_UNSCMENU_RscButton
+		{
+			idc=1602;
+			text="Launch Now";
+			x="0.711406 * safezoneW + safezoneX";
+			y="0.72 * safezoneH + safezoneY";
+			w="0.134062 * safezoneW";
+			h="0.055 * safezoneH";
+			onButtonClick="if (getMarkerColor 'OPTRE_Local_HEVConsolePosMarker' != '') then {disableSerialization; _dialog = findDisplay 5600;_10 = (_dialog displayCtrl 10);_11 = (_dialog displayCtrl 11);_12 = (_dialog displayCtrl 12);_13 = (_dialog displayCtrl 13);_14 = (_dialog displayCtrl 14); _15 = (_dialog displayCtrl 15);_16 = (_dialog displayCtrl 16);0 = [[(getMarkerPos 'OPTRE_Local_HEVConsolePosMarker'),[],(_16 lbValue (lbCurSel _16)),30,2,-1,(_10 lbValue (lbCurSel _10)),(_11 lbValue (lbCurSel _11)),(_12 lbValue (lbCurSel _12)),(_13 lbValue (lbCurSel _13)),(_14 lbValue (lbCurSel _14)),true,(_15 lbValue (lbCurSel _15)),600],OPTRE_CurrentConsole] remoteExec [""OPTRE_Fnc_HEVRoomDynamicSetupGrabUnits"", 2, false];} else {playSound 'FD_CP_Not_Clear_F';};";
+		};
+	};
+};
+
+#include "corvetteHevs\corvetteHevs.hpp";

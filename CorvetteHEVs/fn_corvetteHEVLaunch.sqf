@@ -38,36 +38,20 @@ params [
 	["_chuteDetachHeight",50,[123]]
 ];
 
-private _hevArray = _shipTail getvariable ["OPTRE_DrakeCurrentlyAttachedHEVs",[]];
+
 _shipTail setvariable ["OPTRE_DrakeAllowLaunch",false,true];
 
+// countdown & sound
 private _switchSoundPositon = _shipTail modelToWorldWorld (_shipTail selectionPosition "podswitch");
 private _countDownTime = _shipTail getvariable ["OPTRE_Drake_LaunchInTime",20];
-for "_i" from 0 to _countDownTime do {
-	// using waitAndExecute to spawn a new thread so the rest of the script here can continue instead of waiting
-	if (_i isEqualTo _countDownTime) then {
-		[
-			{
-				params ["_switchSoundPositon"];
-				playSound3D ["a3\missions_f_beta\data\sounds\firing_drills\drill_finish.wss",_switchSoundPositon, true,_switchSoundPositon, 5, 1, 200];
-			},
-			[_switchSoundPositon],
-			_i
-		] call CBA_fnc_waitAndExecute;
-	} else {
-		[
-			{
-				params ["_switchSoundPositon"];
-				playSound3D ["a3\missions_f_beta\data\sounds\firing_drills\drill_finish.wss",_switchSoundPositon, true,_switchSoundPositon, 5, 1, 200];
-			},
-			[_switchSoundPositon],
-			_i
-		] call CBA_fnc_waitAndExecute;
-	};
-	//playSound3D ["a3\missions_f_beta\data\sounds\firing_drills\drill_finish.wss",_soundPositon, true,_soundPositon, 5, 1, 200];
-	//sleep 1; 
+for "_i" from 0 to (_countDownTime - 1) do {
+	playSound3D ["a3\missions_f_beta\data\sounds\firing_drills\drill_finish.wss",_switchSoundPositon, true,_switchSoundPositon, 2, 1, 50];
+	sleep 1;
 };
+playSound3D ["a3\missions_f_beta\data\sounds\firing_drills\drill_finish.wss",_switchSoundPositon, true,_switchSoundPositon, 2, 2, 50];
 
+// close doors
+private _hevArray = _shipTail getvariable ["OPTRE_DrakeCurrentlyAttachedHEVs",[]];
 _hevArray apply {
 	_x animate ["main_door_rotation",0];  
 	_x animate ["left_door_rotation",0];  
@@ -76,27 +60,55 @@ _hevArray apply {
 
 sleep 2; 
 
+// drop
+// this array is used to get the indexes of those that launched for respawn 
 _launchedArray = [];
-_hevArray apply {
+{
 	private _hev = _x;
-	_hevNumber = _hev setVariable ["OPTRE_HEVLauchOrder",_i]; 
+	private _hevNumber = _hev getVariable ["OPTRE_HEVLauchOrder",_forEachIndex];
+	private _gunner = gunner _hev; 
 	
-	if !(isNull (gunner _hev)) then {
-	
+	if !(isNull _gunner) then {
+		
+		// open ship doors
 		_shipTail animate [(format ["drop_door_%1_a_rot",_hevNumber]),1];
 		_shipTail animate [(format ["drop_door_%1_b_rot",_hevNumber]),1];
+		// clsoe after 5 seconds
+		[
+			{
+				params ["_shipTail","_HEVNumber"];
+				_shipTail animate [(format ["drop_door_%1_a_rot",_HEVNumber]),0];
+				_shipTail animate [(format ["drop_door_%1_b_rot",_HEVNumber]),0];
+			},
+			[_shipTail,_HEVNumber],
+			5
+		] call CBA_fnc_waitAndExecute;
 		
-		sleep 0.5;
-		playSound3D ["OPTRE_FunctionsLibrary\sound\PodsDetaching.ogg", _hev, true, getPosASLW _hev, 5, 1, 200];
-		sleep 0.1;
 		detach _hev;
+		[_hev,[0,0,-25]] remoteExecCall ["setVelocityModelSpace",_hev];
+		["OPTRE_Sounds_DetachOLD",(getPosASL _hev) vectorAdd [0,-0.25,0.5],50,2] call OPTRE_fnc_playSound3D;
 		
+		// launch smoke
+		private _smoke = "#particlesource" createVehicle [0,0,0]; 
+		_smoke setParticleClass "Missile2";
+		_smoke attachto [_hev,[0,-0.2,0.6]];
+		[
+			{
+				// delete smoke
+				deleteVehicle (_this select 0);
+			},
+			[_smoke],
+			2
+		] call CBA_fnc_waitAndExecute;
+
+		// need cam shake for occupants
+		// need engine noise for occupants
+		[_hev] remoteExec ["OPTRE_fnc_corvetteHEVPlayerEffects",_gunner];
+
 		_hev setvariable ["OPTRE_HEV_ChuteDeployed",false,true]; // why?
 		_launchedArray pushBack _hev;
-		
 	};
-	
-};
+} forEach _hevArray;
 
 _cleanUpObjects = [];
 while {count _launchedArray > 0} do {

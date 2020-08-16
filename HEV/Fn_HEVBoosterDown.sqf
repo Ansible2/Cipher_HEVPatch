@@ -12,13 +12,12 @@ Parameters:
     1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
     2: _randomXYVelocity <NUMBER> - The deviation by which the pod should randomly drift on the horixontal axis
     3: _launchSpeed <NUMBER> - Downward velocity to start at. (negative numbers only)
-    4: _manualControl <ANY> - DEPRECIATED ENTRY
-    5: _listOfPlayers <ARRAY> - The list of players participating in drop.
-    6: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which re-entry effects will start.
-    7: _ship <OBJECT> - The ship from which the pod dropped.
-    8: _deleteShip <BOOL> - Should the ship be deleted after drop.
-    9: _lastPod <OBJECT> - The last pod to be dropped from ship.
-    10: _HEVLaunchNumber <NUMBER> - The unique drop number. (crucial to certain events to fire properly)
+    4: _listOfPlayers <ARRAY> - The list of players participating in drop.
+    5: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which re-entry effects will start.
+    6: _ship <OBJECT> - The ship from which the pod dropped.
+    7: _deleteShip <BOOL> - Should the ship be deleted after drop.
+    8: _lastPod <OBJECT> - The last pod to be dropped from ship.
+    9: _HEVLaunchNumber <NUMBER> - The unique drop number. (crucial to certain events to fire properly)
 
 Returns:
 	NOTHING
@@ -31,7 +30,6 @@ Examples:
             [playerHEV_1,playerHEV_2],
             2,
             -1,
-            [],
             [player_1,player_2],
             3000,
             myShip,
@@ -51,7 +49,6 @@ params [
     ["_hevArrayPlayer",[],[[]]],
     ["_randomXYVelocity",1,[1]],
     ["_launchSpeed",-1,[1]],
-    ["_manualControl",0,[]],
     ["_listOfPlayers",[],[[]]],
     ["_hevDropArmtmosphereStartHeight",3000,[1]],
     ["_ship",objNull,[objNull]],
@@ -67,15 +64,15 @@ playSound3D ["OPTRE_FunctionsLibrary\sound\PodDetach.ogg",_hev,false,getPosASL _
 private _light = "#lightpoint" createVehicle [0,0,0];
 [0,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light", _listOfPlayers, false];
 
-private _fire = "#particlesource" createVehicle [0,0,0]; 
-_fire setParticleClass "Missile2";
-_fire attachto [_hev,[0,-0.2,0.6]];
+private _smoke = "#particlesource" createVehicle [0,0,0]; 
+_smoke setParticleClass "Missile2";
+_smoke attachto [_hev,[0,-0.2,0.6]];
 
-private _boosterLights = [_fire,_light];
+private _boosterLights = [_smoke,_light];
 
 
 if ((gunner _hev) in (call CBA_fnc_players)) then {
-    [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_manualControl,_hev,_hevDropArmtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
+    [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_hev,_hevDropArmtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
 } else {
     [_hev,[(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed]] remoteExecCall ["setVelocity",_hev];
 };

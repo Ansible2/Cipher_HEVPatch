@@ -74,7 +74,8 @@ params [
 			};
 		};
 	},
-	[_hev,_chuteDeployHeight]
+	[_hev,_chuteDeployHeight],
+	180
 ] call CBA_fnc_waitUntilAndExecute;
 
 

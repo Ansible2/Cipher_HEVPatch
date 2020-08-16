@@ -69,8 +69,10 @@ if (!alive _hev) exitWith {};
             {
                 (_this select 2) apply {deleteVehicle _x};
             },
-            [_hev,_hevDropArmtmosphereEndHeight,_atmoEffects]
+            [_hev,_hevDropArmtmosphereEndHeight,_atmoEffects],
+            180
         ] call CBA_fnc_waitUntilAndExecute;
     },
-    [_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight]
+    [_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight],
+    180
 ] call CBA_fnc_waitUntilAndExecute;

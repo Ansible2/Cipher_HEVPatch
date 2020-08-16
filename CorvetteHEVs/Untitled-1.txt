@@ -1,0 +1,7 @@
+1. Player gets into HEV and then gets action to start the engine
+2. Player starts engine and it plays sound for all (use PlaySound3D for network)
+2a. The engine start eventually morphs into an idle noise that loops
+3. Player gets action to shutdown engine after idle starts.
+3a. If player shutsdown the engine, another global sound will play and cut the loop to a smooth out
+4. Playert
+
