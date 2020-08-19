@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
-Function: OPTRE_fnc_HandleHEVLanding
+Function: OPTRE_fnc_HEVHandleLanding
 
 Description:
 	Handles HEV's final approach to the ground. Removes actions and destroys variables relavent to drop. 
@@ -17,7 +17,7 @@ Returns:
 Examples:
     (begin example)
 
-		[myHEV,,1000] call OPTRE_fnc_HandleHEVLanding;
+		[myHEV,1000] call OPTRE_fnc_HEVHandleLanding;
 
     (end)
 
@@ -40,6 +40,7 @@ params [
 		private _hevPosition = getPosATLVisual _hev;
 		private _hevVectorDir = vectorDirVisual _hev;
 		private _hevVectorUp = vectorUpVisual _hev;
+		_hev setVelocity [0,0,0];
 		_hev setPosATL [_hevPosition select 0,_hevPosition select 1,0];
 		_hev setVectorDirAndUp [_hevVectorDir,_hevVectorUp];
 
