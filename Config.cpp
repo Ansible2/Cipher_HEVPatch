@@ -26,18 +26,6 @@ class CfgFunctions
 				file = "Cipher_HEVPatch\SupportSystem\Fn_CS_ODSTHEV.sqf";
 			};
 		};
-	/*
-		class CorvetteHEVs
-		{
-			file = "Cipher_HEVPatch\CorvetteHevs";
-			class corvetteHEVInit
-			{};
-			class addHEVDialogAction
-			{};
-			class corvetteHEVLaunch
-			{};
-		};
-	*/
 		class HEV
 		{
 			class createCorvette
@@ -64,12 +52,6 @@ class CfgFunctions
 			{
 				file="Cipher_HEVPatch\HEV\Fn_HEVCleanUp.sqf";
 			};
-			/*
-			class HEVControls
-			{
-				file = "Cipher_HEVPatch\HEV\Fn_HEVControls.sqf";
-			};
-			*/
 			class SpawnFakeHEVRoom
 			{
 				file="Cipher_HEVPatch\HEV\Fn_SpawnFakeHEVRoom.sqf";
@@ -164,11 +146,13 @@ class CfgFunctions
 				file = "Cipher_HEVPatch\Modules\Fn_ModuleHEVCleanUp.sqf"; 
 			};
 		};
+		#include "corvetteHevs\corvetteHevsCfgFunctions.hpp"
 	};
 };
 
 class CfgSounds
 {
+	#include "corvetteHevs\corvetteHevsCfgSounds.hpp"
 	sounds[] =
 	{
 		"OPTRE_sounds_HEV_Tone",
@@ -232,6 +216,7 @@ class CfgSounds
 
 class cfgVehicles 
 {
+	#include "corvetteHevs\corvetteHevsCfgVehicles.hpp"
 	class Module_F;
 	class Module_OPTRE_HEV: Module_F
 	{
@@ -428,5 +413,3 @@ class OPTRE_HEVPanel
 		};
 	};
 };
-
-#include "corvetteHevs\corvetteHevs.hpp";
