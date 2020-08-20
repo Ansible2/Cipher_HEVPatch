@@ -79,22 +79,20 @@ _unitsInGroup apply {
 	[
 		_pos,
 		_unitsInGroup,
-		"No frigate",
+		"No Ship",
 		5,
 		1,
 		1,
-		0,
 		3500,
 		3000,
 		2000,
 		1000,
 		500,
-		100,
 		true,
 		true,
-		600,
+		300,
 		true
-	] call OPTRE_Fnc_HEV; 
+	] call OPTRE_fnc_HEV; 
 } call CBA_fnc_directCall;
 
 

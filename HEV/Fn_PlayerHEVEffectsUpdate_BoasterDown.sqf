@@ -11,9 +11,8 @@ Parameters:
 	0: _randomXVelocity <NUMBER> - The maximum X deviation of velocity.
     1: _randomYVelocity <NUMBER> - The maximum Y deviation of velocity.
 	2: _launchSpeed <NUMBER> - The downward starting velocity of the HEV (negative numbers only).
-    3: _manualControlState <ANY> - DEPRECIATED ENTRY
-	4: _hev <OBJECT> - The HEV to affect the changes on.
-    5: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which the HEV will play its enter atmo effects (ATL).
+	3: _hev <OBJECT> - The HEV to affect the changes on.
+    4: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which the HEV will play its enter atmo effects (ATL).
 
 Returns:
 	NOTHING
@@ -21,7 +20,7 @@ Returns:
 Examples:
     (begin example)
 
-		[1,1,-1,[],myHEV,3000] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
+		[1,1,-1,myHEV,3000] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
 
     (end)
 
@@ -35,7 +34,6 @@ params [
 	["_randomXVelocity",1,[1]],
 	["_randomYVelocity",1,[1]],
 	["_launchSpeed",-1,[1]],
-	["_manualControlState",0,[]],
 	["_hev",objNull,[objNull]],
 	["_hevDropArmtmosphereStartHeight",3000,[1]]
 ];
@@ -46,7 +44,6 @@ detach _hev;
 
 [_hev,[_randomXVelocity,_randomYVelocity,_launchSpeed]] remoteExecCall ["setVelocity",_hev];
 
-//playSound "OPTRE_Sounds_Detach";
 playSound "OPTRE_Sounds_DetachOLD";
 
 resetCamShake;
@@ -61,14 +58,9 @@ playSound ["OPTRE_Sounds_Engine",true];
 	{
 		addCamShake [1, 999, 11];
 	},
-	[_hev,_hevDropArmtmosphereStartHeight]
+	[_hev,_hevDropArmtmosphereStartHeight],
+	180
 ] call CBA_fnc_waitUntilAndExecute;
-
-/*
-if (_manualControlState > 0) then {
-	[_manualControlState] call OPTRE_fnc_HEVControls;
-};
-*/
 
 // this logic is used to play the wind sound using say2D so that the logic can be deleted at anytime, stopping the sound
 private _logicCenter = createCenter sideLogic;

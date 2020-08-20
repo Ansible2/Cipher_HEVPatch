@@ -9,7 +9,8 @@ Description:
 Parameters:
 
 	0: _units <ARRAY> - The units to teleport into the pods
-	1: _startHeight <OBJECT> - The ship to attach the pods to
+	1: _startHeight <NUMBER> - Height ATL to start drop at
+	2: _ship <OBJECT> - A dummy object to attach the HEVs to before they drop
 
 Returns:
 	_allHEVs <ARRAY> - contains information pertinent to OPTRE_Fnc_HEV
@@ -22,7 +23,7 @@ Returns:
 Examples:
     (begin example)
 
-		[[player1,player2],5500] call OPTRE_Fnc_SpawnHEVsNoFrigate;
+		[[player1,player2],[],myDummyShip] call OPTRE_Fnc_SpawnHEVsNoFrigate;
 
     (end)
 
@@ -33,7 +34,8 @@ Author:
 
 params [
 	["_units",[],[[]]],
-	["_startHeight",5500,[1]]
+	["_startHeight",5500,[123]],
+	["_ship",objNull,[objNull]]
 ];
 
 // prepare return information
@@ -79,6 +81,8 @@ private _fn_OPTRESpawnHEVs = {
 		
 		private _unitDir = getDir _unit;
 		_hev setDir _unitDir;
+
+		[_hev,_ship,true] call BIS_fnc_attachToRelative;
 		
 		_hev lock true; 
 		_hevArray pushBack _hev;

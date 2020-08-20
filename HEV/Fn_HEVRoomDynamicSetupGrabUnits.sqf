@@ -122,37 +122,23 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 	// if there are units that dropped then cooldown, else don't
 	if (count _units > 0) then {
 		_menuInputValues set [1, _units];
-
 		
-		/* 	
-			This is a repurposing of the menu dialog used for HEVs.
-		 	In the interest of perserving configs, 
-				the value/field in the menu used for determining the control of the pods (full, rotation only, and none)
-				has been used to instead determine the drop type requested from the menu.
-			To do this in script, the value inside _menuInputValues select 6 will now be used to set position 2
-				which is the drop type (frigate, corvette, or no ship).
-			It will auto default to the corvette if the dev version is not loaded.
-			drops are: 0 = "corvette", 1 = "frigate", 2 = "No Ship" 
-		*/
-		private _dropType = _menuInputValues select 6;
-		switch _dropType do {
-			case 0: {
-				_menuInputValues set [2,"corvette"];
-			};
-			case 1: {
-				if ((_dropType isEqualTo 1) AND {isClass (configfile >> "CfgVehicles" >> "OPTRE_Frigate_UNSC")}) then {
-					_menuInputValues set [2,"frigate"];
-				} else {
-					_menuInputValues set [2,"corvette"];
-				};
-			};
-			case 2: {
-				_menuInputValues set [2,"No Frigate"];
-			};
+		// number values from the HEV panel need to be translated into strings
+		private _deploymentType = _menuInputValues select 2;
+		switch (_deploymentType) do {
+			case 0: {_menuInputValues set [2,"corvette"];};
+			case 1: {_menuInputValues set [2,"frigate"];};
+		};
+
+		// setting delete chutes on detach value to a bool instead of number
+		if ((_menuInputValues select 12) isEqualTo 0) then {
+			_menuInputValues set [12,true];
+		} else {
+			_menuInputValues set [12,false];
 		};
 
 		// using direct call to ensure unscheduled at start
-		{_menuInputValues call OPTRE_Fnc_HEV;} call CBA_fnc_directCall;
+		{_menuInputValues call OPTRE_fnc_HEV;} call CBA_fnc_directCall;
 		_console setVariable ["OPTRE_PodsLaunchIn",-2,true];
 
 		// launch cooldown
@@ -219,8 +205,9 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 // Further modification note on where and how this is executed due to it being buried
 /*-------------------------------------------------------------------
 	remoteExec'd onto server directly from "OPTRE_UNSCMENU_RscButton_1602" which is located under: configFile >> "OPTRE_HEVPanel" >> "controls" >> "OPTRE_UNSCMENU_RscButton_1602"
+	This control is from OPTRE_Module.pbo\config.bin
 
-	synax:
+	syntax:
 
 	onButtonClick = "if (getMarkerColor 'OPTRE_Local_HEVConsolePosMarker' != '') then {
 		disableSerialization; 

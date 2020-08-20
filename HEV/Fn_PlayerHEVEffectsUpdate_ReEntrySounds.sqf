@@ -39,7 +39,7 @@ if (typeOf _hev != "OPTRE_HEV" OR {!(alive (gunner _hev))}) exitWith {};
 playSound "OPTRE_Sounds_ReEntryBuildUp";
 
 [
-	{playSound "OPTRE_Sounds_HEV_Interior_01";},
+	{playSound "OPTRE_sounds_HEV_interiorDropLoop";},
 	0.75,
 	[_stopSoundHeight,_hev],
 	{},

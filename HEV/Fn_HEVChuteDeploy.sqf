@@ -93,7 +93,8 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
         };    
     
     },
-    [_hev,_hevArrayPlayer,_chute,_chuteDeployHeight,_lastPod,_handleLandingEventString]
+    [_hev,_hevArrayPlayer,_chute,_chuteDeployHeight,_lastPod,_handleLandingEventString],
+    180
 ] call CBA_fnc_waitUntilAndExecute;
 
 //chute detach
@@ -135,5 +136,6 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
             missionNamespace setVariable [_deleteReadyString,true,[0,2] select isMultiplayer];
         };
     },
-    [_hev,_chute,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_HEVLaunchNumbertring,_chuteArrayEventString]
+    [_hev,_chute,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_HEVLaunchNumbertring,_chuteArrayEventString],
+    180
 ] call CBA_fnc_waitUntilAndExecute;

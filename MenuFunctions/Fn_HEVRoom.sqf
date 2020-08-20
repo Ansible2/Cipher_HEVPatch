@@ -96,17 +96,22 @@ _linkedPods apply {
 	_14 lbSetValue [_i, _x];
 };
 
-[0] apply {
-	_i = _15 lbAdd (format ["Boaster Height: %1m",_x]);
+[0,1] apply {
+	_i = _15 lbAdd (format ["Delete Chutes On Detach: %1",
+		(switch _x do {
+				case 0: {"Yes"};
+				case 1: {"No"}; 
+			}
+		)]);
+
 	_15 lbSetValue [_i, _x];
 };
 
-[0,1,2] apply {
+[0,1] apply {
 	_i = _16 lbAdd (format ["Deployment: %1",
 		(switch _x do {
 				case 0: {"Corvette"};
 				case 1: {"Frigate"}; 
-				case 2: {"No Ship"};  
 			}
 		)]);
 
