@@ -132,6 +132,7 @@ _allHEVs = call {
 		_ship = "OPTRE_Frigate_UNSC" createVehicle [0,0,0];	
 		_ship setVariable ["OPTRE_shipParts",[_ship]];
 		_ship setPosATL _dropPosition;	
+		_ship setVectorUp [0,0,1];
 		private _return = [_ship,_units] call OPTRE_fnc_SpawnHEVsFrigate;
 
 		_return
