@@ -32,7 +32,7 @@ if (!isServer) exitWith {false};
 
 params [
 	["_ship",objNull,[objNull]],
-	["_mode",false,[true]],
+	["_mode",0,[123]],
 	["_debugMode",false,[true]],
 	["_launchTime",-1,[123]],
 	["_reloadTime",-1,[123]]

@@ -59,6 +59,11 @@ class OPTRE_UNSC_Drake : House_F
 					name = "Activate Advanced HEV System";
 					value = 2;
 				};
+				class on2
+				{
+					name = "Activate Advanced HEV System (Pod Control Panel)";
+					value = 3;
+				};
 			};
 		
 		};
