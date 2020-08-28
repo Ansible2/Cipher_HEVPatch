@@ -8,7 +8,6 @@ class CfgPatches
 		requiredAddons[]=
 		{
 			"OPTRE_FunctionsLibrary",
-			//"OPTRE_Corvette",
 			"OPTRE_modules",
 			"OPTRE_Core",
 			"CBA_main"
@@ -26,18 +25,6 @@ class CfgFunctions
 				file = "Cipher_HEVPatch\SupportSystem\Fn_CS_ODSTHEV.sqf";
 			};
 		};
-	/*
-		class CorvetteHEVs
-		{
-			file = "Cipher_HEVPatch\CorvetteHevs";
-			class corvetteHEVInit
-			{};
-			class addHEVDialogAction
-			{};
-			class corvetteHEVLaunch
-			{};
-		};
-	*/
 		class HEV
 		{
 			class createCorvette
@@ -64,12 +51,6 @@ class CfgFunctions
 			{
 				file="Cipher_HEVPatch\HEV\Fn_HEVCleanUp.sqf";
 			};
-			/*
-			class HEVControls
-			{
-				file = "Cipher_HEVPatch\HEV\Fn_HEVControls.sqf";
-			};
-			*/
 			class SpawnFakeHEVRoom
 			{
 				file="Cipher_HEVPatch\HEV\Fn_SpawnFakeHEVRoom.sqf";
