@@ -59,7 +59,7 @@ playSound ["OPTRE_Sounds_Engine",true];
 		addCamShake [1, 999, 11];
 	},
 	[_hev,_hevDropArmtmosphereStartHeight],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 // this logic is used to play the wind sound using say2D so that the logic can be deleted at anytime, stopping the sound

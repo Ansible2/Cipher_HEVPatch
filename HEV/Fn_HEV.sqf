@@ -212,7 +212,7 @@ if (count _listOfPlayers < 1) then {
 				};
 			},
 			[_x,_forEachIndex,_launchDelay],
-			180
+			300
 		] call CBA_fnc_waitUntilAndExecute;
 
 	} forEach _hevArray;
@@ -280,7 +280,7 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 		};
 	},
 	[_hevArray,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_hevArray select 0],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 
@@ -319,7 +319,7 @@ private _chuteArrayEventID = [
 		];
 
 		if (isNull _chute) exitWith {
-			["null _chute passed to OPTRE_addChuteToDeletion"] call BIS_fnc_error;
+			"null _chute passed to OPTRE_addChuteToDeletion" call BIS_fnc_error;
 		};
 
 		private _chuteArray = missionNamespace getVariable [_chuteArrayVarString,[]];
@@ -330,7 +330,7 @@ private _chuteArrayEventID = [
 ] call CBA_fnc_addEventHandlerArgs;
 
 
-// remove unique eventHandler when the global variable isNil
+// remove unique eventHandler when the _chuteArrayEventString global variable isNil
 [
 	{isNil (_this select 0)},
 	{
@@ -342,7 +342,7 @@ private _chuteArrayEventID = [
 		[_chuteArrayEventString,_chuteArrayEventID] call CBA_fnc_removeEventHandler;
 	},
 	[_chuteArrayEventString,_chuteArrayEventID],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 
@@ -394,7 +394,7 @@ if (!isNull _ship AND {_deleteShip}) then {
 			};
 		},
 		[_deleteShipString,_ship],
-		180
+		300
 	] call CBA_fnc_waitUntilAndExecute;
 };
 
@@ -420,7 +420,7 @@ private _deleteReadyString = ["OPTRE_HEV_deleteReady",str _HEVLaunchNumber] join
 		[_hevArray,_deleteHEVsAfter] spawn OPTRE_fnc_HEVCleanUp;
 	},
 	[_hevArray,_chuteArrayVarString,_deleteChutesOnDetach,_deleteHEVsAfter,_deleteReadyString],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 

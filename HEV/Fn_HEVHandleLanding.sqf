@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
-Function: OPTRE_fnc_HandleHEVLanding
+Function: OPTRE_fnc_HEVHandleLanding
 
 Description:
 	Handles HEV's final approach to the ground. Removes actions and destroys variables relavent to drop. 
@@ -17,7 +17,7 @@ Returns:
 Examples:
     (begin example)
 
-		[myHEV,,1000] call OPTRE_fnc_HandleHEVLanding;
+		[myHEV,,1000] call OPTRE_fnc_HEVHandleLanding;
 
     (end)
 
@@ -75,7 +75,7 @@ params [
 		};
 	},
 	[_hev,_chuteDeployHeight],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 

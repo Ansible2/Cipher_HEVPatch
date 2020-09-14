@@ -36,5 +36,5 @@ if (isNull _gunner OR {!alive _gunner} OR {!(_gunner in (call CBA_fnc_players))}
 		playsound "OPTRE_Sounds_HEV_GroundAlarm";
 	},
 	[_hev],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute; 
