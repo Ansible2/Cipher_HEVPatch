@@ -13,6 +13,7 @@ Description:
 
 Parameters:
 	0: _menuInputValues <ARRAY> - The values that were selected from the drop menu
+
 	1: _console <NUMBER> - The control panel
 
 Returns:
@@ -106,7 +107,9 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 	sleep 3;
 
 
-	// save pod cargo, move units out of pods to be teleported to new ones in the sky
+	// save pod cargo, move units out of pods that are on the ground to be teleported to new ones in the sky
+	private _consolePosition = getPosATL _console;
+	private _randomOffset = 0;
 	_units apply {
 		private _unit = _x;
 		private _podCargo = [objectParent _unit] call OPTRE_fnc_getContainerCargo;
@@ -115,7 +118,13 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 			_unit setVariable ["OPTRE_podCargo",_podCargo];
 		};
 
-		moveOut _unit;
+		// teleport players out of their pods so they can be put in the new ones
+		// this is done around the console just in case something goes wrong
+		_randomOffset = random 2;
+		// moveOut has issues alone when the units are in a group, hence the setPosATL
+		// there are also issues using these over the network so remoteExec'd on local machine 
+		[_unit] remoteExecCall ["moveOut",_unit];
+		[_unit,(_consolePosition vectorAdd [_randomOffset,_randomOffset,0])] remoteExecCall ["setPosATL",_unit];
 	};
 
 
@@ -209,7 +218,8 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 
 	syntax:
 
-	onButtonClick = "if (getMarkerColor 'OPTRE_Local_HEVConsolePosMarker' != '') then {
+	onButtonClick = "
+	if (getMarkerColor 'OPTRE_Local_HEVConsolePosMarker' != '') then {
 		disableSerialization; 
 		_dialog = findDisplay 5600;
 		_10 = (_dialog displayCtrl 10);
