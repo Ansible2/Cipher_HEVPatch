@@ -128,7 +128,8 @@ private _standardPodCargo = [[["OPTRE_Biofoam"],[2]],[["OPTRE_ELB47_Strobe",1],[
 			private _posRelative = [_forEachIndex] call _fn_getRowPosition;
 
 			// attach HEV to corvette
-			_hev setPosATL (_ship modelToWorldVisual _posRelative);
+			// this positioning is to account for both water and land drops
+			_hev setPosATL (ASLToATL (AGLToASL (_ship modelToWorldVisual _posRelative)));
 			_hev setVectorDirAndUp [(_ship vectorModelToWorldVisual (_relativeVector select 0)),(_ship vectorModelToWorldVisual (_relativeVector select 1))];
 			[_hev,_ship,true] call BIS_fnc_attachToRelative;
 			
