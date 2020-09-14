@@ -39,14 +39,14 @@ private _HEVMenuList = _dialog displayCtrl 1500;
 private _controlMenuList = _dialog displayCtrl 1501;
 (_dialog displayCtrl 1) ctrlSetStructuredText parseText ("<img image='\A3\Ui_f\data\GUI\Cfg\Ranks\private_gs.paa'/> "+"Logged In: "+(name player));
 (_dialog displayCtrl 2) ctrlSetText (format ["%1",_highestCard]); 
-_10 = (_dialog displayCtrl 10);
-_11 = (_dialog displayCtrl 11);
-_12 = (_dialog displayCtrl 12);
-_13 = (_dialog displayCtrl 13);
-_14 = (_dialog displayCtrl 14);
-_15 = (_dialog displayCtrl 15);
-_16 = (_dialog displayCtrl 16);
-_info = (_dialog displayCtrl 1000);
+private _10 = (_dialog displayCtrl 10);
+private _11 = (_dialog displayCtrl 11);
+private _12 = (_dialog displayCtrl 12);
+private _13 = (_dialog displayCtrl 13);
+private _14 = (_dialog displayCtrl 14);
+private _15 = (_dialog displayCtrl 15);
+private _16 = (_dialog displayCtrl 16);
+private _info = (_dialog displayCtrl 1000);
 
 
 OPTRE_UNSC_Console_MenusAllowed apply {
@@ -123,8 +123,6 @@ _linkedPods apply {
 };
 
 
-private _countHEVs = (count _linkedPods) - 1;
-
 (_dialog displayCtrl 1201) ctrlAddEventHandler ["Draw","
 	if (getMarkerColor 'OPTRE_Local_HEVConsolePosMarker' != '') then {
 		(_this select 0) drawLine [([(getMarkerPos 'OPTRE_Local_HEVConsolePosMarker'), 20000, 0] call BIS_fnc_relPos), ([(getMarkerPos 'OPTRE_Local_HEVConsolePosMarker'), 20000, 180] call BIS_fnc_relPos), [1,0,0,1]];
@@ -133,6 +131,7 @@ private _countHEVs = (count _linkedPods) - 1;
 	};
 "];
 
+private _countHEVs = (count _linkedPods) - 1;
 While {str (findDisplay 5600) != "No display"} do {
 
 	for "_i" from 0 to _countHEVs do {
