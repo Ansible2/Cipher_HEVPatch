@@ -94,7 +94,7 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
     
     },
     [_hev,_hevArrayPlayer,_chute,_chuteDeployHeight,_lastPod,_handleLandingEventString],
-    180
+    300
 ] call CBA_fnc_waitUntilAndExecute;
 
 //chute detach
@@ -137,5 +137,5 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
         };
     },
     [_hev,_chute,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_HEVLaunchNumbertring,_chuteArrayEventString],
-    180
+    300
 ] call CBA_fnc_waitUntilAndExecute;

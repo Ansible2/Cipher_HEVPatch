@@ -40,7 +40,6 @@ params [
 		private _hevPosition = getPosATLVisual _hev;
 		private _hevVectorDir = vectorDirVisual _hev;
 		private _hevVectorUp = vectorUpVisual _hev;
-		_hev setVelocity [0,0,0];
 		_hev setPosATL [_hevPosition select 0,_hevPosition select 1,0];
 		_hev setVectorDirAndUp [_hevVectorDir,_hevVectorUp];
 
@@ -76,7 +75,7 @@ params [
 		};
 	},
 	[_hev,_chuteDeployHeight],
-	180
+	300
 ] call CBA_fnc_waitUntilAndExecute;
 
 
