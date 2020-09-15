@@ -36,21 +36,21 @@ params [
 	["_units",[],[[]]]
 ];
 
-// some pre-detemined position coordinates relaive to the corvette's center object.
-private _relativeRowPositions = [
-	[-18.8252,8.86279,-0.748383],
-	[-18.8252,-14.0374,-0.749481],
-	[-18.8252,46.7913,-22.3492],
-	[-18.8252,20.2451,-22.3492],
-	[-18.8252,-2.65552,-0.748383],
-	[-18.8252,33.3865,-22.3492]
-];
-
 
 // sets a position on the corvetter for the pod to be attached to relative to others already attached
 private _fn_getRowPosition = {
 	params [
 		["_index",0,[1]]
+	];
+	
+	// some pre-detemined position coordinates relaive to the corvette's center object.
+	private _relativeRowPositions = [
+		[-18.8252,8.86279,-0.748383],
+		[-18.8252,-14.0374,-0.749481],
+		[-18.8252,46.7913,-22.3492],
+		[-18.8252,20.2451,-22.3492],
+		[-18.8252,-2.65552,-0.748383],
+		[-18.8252,33.3865,-22.3492]
 	];
 
 	if (_index < 8) exitWith {
@@ -128,7 +128,8 @@ private _standardPodCargo = [[["OPTRE_Biofoam"],[2]],[["OPTRE_ELB47_Strobe",1],[
 			private _posRelative = [_forEachIndex] call _fn_getRowPosition;
 
 			// attach HEV to corvette
-			_hev setPosATL (_ship modelToWorldVisual _posRelative);
+			// this positioning is to account for both water and land drops
+			_hev setPosATL (ASLToATL (AGLToASL (_ship modelToWorldVisual _posRelative)));
 			_hev setVectorDirAndUp [(_ship vectorModelToWorldVisual (_relativeVector select 0)),(_ship vectorModelToWorldVisual (_relativeVector select 1))];
 			[_hev,_ship,true] call BIS_fnc_attachToRelative;
 			

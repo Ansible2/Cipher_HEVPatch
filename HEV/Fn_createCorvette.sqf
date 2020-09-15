@@ -21,7 +21,7 @@ Author:
 	Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
 params [
-	["_spawnPosition",[0,0,0],[[]]]
+	["_spawnPosition",[0,0,0],[[],objNull]]
 ];
 
 if (_spawnPosition isEqualType objNull AND {isNull _spawnPosition}) exitWith {
@@ -65,7 +65,8 @@ private "_corvetteCenter";
 		_piece setPosATL _spawnPosition;
 		_piece setVectorDirAndUp _vectorsRelative;
 	} else {
-		_piece setPosATL (_corvetteCenter modelToWorldVisual _posRelative);
+		// used to make the positions the same over water and land
+		_piece setPosATL (ASLToATL (AGLToASL (_corvetteCenter modelToWorldVisual _posRelative)));
 		_piece setVectorDirAndUp [(_corvetteCenter vectorModelToWorldVisual (_vectorsRelative select 0)),(_corvetteCenter vectorModelToWorldVisual (_vectorsRelative select 1))];
 	};
 
