@@ -83,8 +83,9 @@ if (_ejectGunner) then {
 			];
 			private _gunner = gunner _hev; 
 
-			_gunner action ["getOut", _hev];
-			_gunner leaveVehicle _hev;
+			unassignVehicle _gunner;
+			moveOut _gunner;
+			_gunner setVehiclePosition [getPosATLVisual _hev,[],3,"NONE"];
 		},
 		[_hev],
 		1
