@@ -14,7 +14,7 @@ Parameters:
 	
 	1: _units <ARRAY> - The units to teleport to drop pods
 	
-	2: _shipDeployment <STRING> - How to drop the units: Options are "frigate", "corvette", OR "No Ship". 
+	2: _shipDeployment <STRING> - How to drop the units: Options are "frigate", "corvette", "No Ship", and "No Ship Custom". 
 	
 	3: _launchDelay <NUMBER> - How long for pods to hang in seconds. >30 is required for engine start sound effects.
 	
@@ -32,7 +32,7 @@ Parameters:
 	
 	10: _chuteDetachHeight <NUMBER> - The altitude to detach chutes at.
 	
-	11: _deleteShip <NUMBER> - Should the ship the units are dropped from be deleted? (not req if used with "No Ship Deployment")
+	11: _deleteShip <NUMBER> - Should the ship the units are dropped from be deleted? (not req if used with both "No Ship" deployments)
 	
 	12: _deleteChutesOnDetach <BOOL> - Should chutes be deleted after detaching from HEV?
 	
@@ -70,7 +70,6 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-
 if (!isServer) exitWith {false};
 
 params	[
@@ -110,9 +109,11 @@ if (_shipDeployment == "Frigate" AND {!(isClass (configfile >> "CfgVehicles" >> 
 	_shipDeployment = "Corvette";
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////// Spawn HEVs //////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* ----------------------------------------------------------------------------
+
+	Spawn HEVs
+
+---------------------------------------------------------------------------- */
 private ["_allHEVs","_ship"];
 
 // spawn HEVs and get their info for the drop. Also creates frigate or corvette
@@ -151,8 +152,21 @@ _allHEVs = call {
 		
 		_return
 	};
+	// no ship custom spawns units at requested drop zone instead of directly above their position 
+	if (_shipDeployment == "No Ship Custom") exitWith {
+		// this is a dummy ship used to attach the HEVs to so that they do not fall before launch
+		private _logicCenter = createCenter sideLogic;
+		private _logicGroup = createGroup _logicCenter;
+		_ship = _logicGroup createUnit ["Logic", [0,0,0], [], 0, "NONE"];
+		_ship setVariable ["OPTRE_shipParts",[_ship]];
+		_ship setPosATL _dropPosition;
 
-	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Ship"} AND {_shipDeployment != "Frigate"}) exitWith {
+		private _return = [_units,_startHeight,_ship,true] call OPTRE_fnc_SpawnHEVsNoFrigate;
+		
+		_return
+	};
+
+	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Ship"} AND {_shipDeployment != "Frigate"} AND {_shipDeployment != "No Ship Custom"}) exitWith {
 		"Unsupported STRING entry for _shipDeployment parameter" call BIS_fnc_error;
 		false
 	};
@@ -164,12 +178,13 @@ private _hevArrayPlayer = _allHEVs select 1;
 private _hevArrayAi = _allHEVs select 2;		
 private _listOfPlayers = _allHEVs select 3;		
 private _listOfAi = _allHEVs select 4;	
+
+
+/* ----------------------------------------------------------------------------
+
+	Start Drop Count Down
 	
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////// Start Drop Count Down ///////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+---------------------------------------------------------------------------- */
 // Prepare unique strings for events, this is so multiple drops can happen at once
 private _HEVLaunchNumber = missionNamespace getVariable ["OPTRE_HEVLaunchNumber",1];
 missionNamespace setVariable ["OPTRE_HEVLaunchNumber",_HEVLaunchNumber + 1];
@@ -220,10 +235,11 @@ if (count _listOfPlayers < 1) then {
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////// Down Boaster Effects Event ///////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* ----------------------------------------------------------------------------
 
+	Down Boaster Effects Event
+	
+---------------------------------------------------------------------------- */
 // Server event fires when count down is complete
 private _lastPod = _hevArray select ((count _hevArray) - 1);
 [
@@ -259,10 +275,11 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 ] call CBA_fnc_addEventHandlerArgs;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// Atmosphere Entry Effects //////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* ----------------------------------------------------------------------------
 
+	Atmosphere Entry Effects
+	
+---------------------------------------------------------------------------- */
 [	// waitUntil first pod is at the _hevDropArmtmosphereStartHeight
 	{getPosATLVisual (_this select 5) select 2 < (_this select 4)},
 	{	
@@ -284,10 +301,11 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 ] call CBA_fnc_waitUntilAndExecute;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// Chute Open ////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* ----------------------------------------------------------------------------
 
+	Chute Open
+	
+---------------------------------------------------------------------------- */
 private _handleLandingEventString = ["OPTRE_HEV_handleLanding",_HEVLaunchNumbertring] joinString "_";
 private _chuteArrayVarString = ["OPTRE_HEV_chuteArray",_HEVLaunchNumbertring] joinString "_";
 private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
@@ -346,10 +364,13 @@ private _chuteArrayEventID = [
 ] call CBA_fnc_waitUntilAndExecute;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// Handle Landing ////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/* ----------------------------------------------------------------------------
+
+	Handle Landing
+	
+---------------------------------------------------------------------------- */
 // Server event
 [
 	_handleLandingEventString, 
@@ -371,11 +392,11 @@ private _chuteArrayEventID = [
 	[_hevArray,_chuteDeployHeight]
 ] call CBA_fnc_addEventHandlerArgs;
 
+/* ----------------------------------------------------------------------------
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////// Clean Up //////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	Clean Up
+	
+---------------------------------------------------------------------------- */
 // delete corvette
 if (!isNull _ship AND {_deleteShip}) then {
 	

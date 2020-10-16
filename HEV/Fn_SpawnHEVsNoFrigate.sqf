@@ -7,10 +7,12 @@ Description:
 	Modifications: Adapted for use on dedicated servers, improved performance/readability
 
 Parameters:
-
 	0: _units <ARRAY> - The units to teleport into the pods
 	1: _startHeight <NUMBER> - Height ATL to start drop at
 	2: _ship <OBJECT> - A dummy object to attach the HEVs to before they drop
+	3: _dropAtShipPosition <BOOL> - To preserve the same behaviour from the drop module
+	 that puts units directly above their position, this parameter allows you to instead 
+	 drop over the designated drop zone
 
 Returns:
 	_allHEVs <ARRAY> - contains information pertinent to OPTRE_Fnc_HEV
@@ -22,8 +24,8 @@ Returns:
 
 Examples:
     (begin example)
-
-		[[player1,player2],[],myDummyShip] call OPTRE_Fnc_SpawnHEVsNoFrigate;
+		// drop directly over the units position
+		[[player1,player2],[],myDummyShip,false] call OPTRE_Fnc_SpawnHEVsNoFrigate;
 
     (end)
 
@@ -31,11 +33,11 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-
 params [
 	["_units",[],[[]]],
 	["_startHeight",5500,[123]],
-	["_ship",objNull,[objNull]]
+	["_ship",objNull,[objNull]],
+	["_dropAtShipPosition",false,[true]]
 ];
 
 // prepare return information
@@ -60,8 +62,14 @@ private _fn_OPTRESpawnHEVs = {
 
 	if (alive _unit) then {
 		
-		private _unitPos = getPosATL _unit;
-		private _spawnPos = [(_unitPos select 0),(_unitPos select 1),_startHeight];
+		private "_spawnPos";
+		if (_dropAtShipPosition) then {
+			private _randomPosition = [_ship,75] call CBA_fnc_randPos;
+			_spawnPos = [(_randomPosition select 0),(_randomPosition select 1),_startHeight];
+		} else {
+			private _unitPos = getPosATL _unit;
+			_spawnPos = [(_unitPos select 0),(_unitPos select 1),_startHeight];
+		};
 		
 		// create HEV
 		private _hev = createVehicle ["OPTRE_HEV", [0,0,0], [], 0, "NONE"];

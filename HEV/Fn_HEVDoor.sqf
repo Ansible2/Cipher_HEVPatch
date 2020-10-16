@@ -88,6 +88,6 @@ if (_ejectGunner) then {
 			_gunner setVehiclePosition [getPosATLVisual _hev,[],3,"NONE"];
 		},
 		[_hev],
-		1
+		2
 	] call CBA_fnc_waitAndExecute;
 };
