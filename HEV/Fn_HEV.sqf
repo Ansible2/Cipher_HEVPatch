@@ -70,7 +70,19 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+/*
+	The biggest issue with this system in terms of optimization atm is the need to remoteExec
+	 and pass large arrays over the network. Shouldn't be doing this if at all possible and 
+	 on top of that, it is done multiple times for several different functions pushing the same arrays.
+	 
+	If anything, send the arrays once. Could use the drop string as a reference for a global/string to work from.
+	 Have a function that sets these globals and one that deletes them. Both of which would be trigggered by the server.
+*/
+
+
+
 #define HEV_LOG(MESSAGE) ["OPTRE_fnc_HEV",MESSAGE] call OPTRE_fnc_hevPatchLog;
+#define DROP_TIME_BUFFER 0.35
 
 if (!isServer) exitWith {
 	HEV_LOG("Did not execute as machine is not server")
@@ -148,7 +160,7 @@ private _dropDataArray = call {
 		_ship = _shipParts select 0;
 		_ship setVariable ["OPTRE_shipParts",_shipParts];
 		
-		private _return = [_ship,_units] call OPTRE_fnc_SpawnHEVsCorvette;
+		private _return = [_ship,_units] call OPTRE_fnc_spawnHEVsCorvette;
 
 		_return
 	};
@@ -161,7 +173,7 @@ private _dropDataArray = call {
 		_ship setPosATL _dropPosition;
 		_ship setVectorUp [0,0,1];
 
-		private _return = [_ship,_units] call OPTRE_fnc_SpawnHEVsFrigate;
+		private _return = [_ship,_units] call OPTRE_fnc_spawnHEVsFrigate;
 
 		_return
 	};
@@ -176,7 +188,7 @@ private _dropDataArray = call {
 		_ship setVariable ["OPTRE_shipParts",[_ship]];
 		_ship setPosATL _dropPosition;
 
-		private _return = [_units,_startHeight,_ship] call OPTRE_fnc_SpawnHEVsNoFrigate;
+		private _return = [_units,_startHeight,_ship] call OPTRE_fnc_spawnHEVsNoFrigate;
 		
 		_return
 	};
@@ -191,7 +203,7 @@ private _dropDataArray = call {
 		_ship setVariable ["OPTRE_shipParts",[_ship]];
 		_ship setPosATL _dropPosition;
 
-		private _return = [_units,_startHeight,_ship,true] call OPTRE_fnc_SpawnHEVsNoFrigate;
+		private _return = [_units,_startHeight,_ship,true] call OPTRE_fnc_spawnHEVsNoFrigate;
 		
 		_return
 	};
@@ -254,9 +266,16 @@ if !(_playersInDrop isEqualTo []) then {
 
 			waitUntil {
 				sleep 0.1;
-				!isNull (gunner _hev)
+				if !(isNull gunner _hev) exitWith {true};
+				false
+			};
+
+			private _hevPilot = gunner _hev;
+			if (_hevPilot in allPlayers) then {
+				[_launchIndex,_launchDelay,_hevPilot] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_PlayTones",_hevPilot];
 			};
 		};
+	/*	
 		[
 			{!isNull (gunner (_this select 0))},
 			{
@@ -274,6 +293,7 @@ if !(_playersInDrop isEqualTo []) then {
 			[_x,_forEachIndex,_launchDelay],
 			300
 		] call CBA_fnc_waitUntilAndExecute;
+	*/
 
 	} forEach _allHEVsInDrop;
 	
@@ -290,6 +310,7 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 [
 	_countDownDoneEventString, 
 	{
+		HEV_LOG("Executing countdown done server event")
 
 		_thisArgs params [
 			"_allHEVsInDrop",
@@ -310,7 +331,7 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner (_this select 0)];
 				},
 				[_x,_playerHEVs,_randomXYVelocity,_launchSpeed,_playersInDrop,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
-				_forEachIndex * 0.35
+				_forEachIndex * DROP_TIME_BUFFER // provide a buffer between each pods drop
 			] call CBA_fnc_waitAndExecute;
 		} forEach _allHEVsInDrop;
 
@@ -325,26 +346,44 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 	Atmosphere Entry Effects
 	
 ---------------------------------------------------------------------------- */
-[	// waitUntil first pod is at the _hevDropArmtmosphereStartHeight
-	{getPosATLVisual (_this select 5) select 2 < (_this select 4)},
-	{	
-		params [
-			["_allHEVsInDrop",[],[[]]],
-			["_playerHEVs",[],[[]]],
-			["_playersInDrop",[],[[]]],
-			["_hevDropArmtmosphereEndHeight",2000,[1]],
-			["_hevDropArmtmosphereStartHeight",3000,[1]]
-		];
+null = [_allHEVsInDrop,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_allHEVsInDrop select 0] spawn {
+	params [
+		"_allHEVsInDrop",
+		"_playerHEVs",
+		"_playersInDrop",
+		"_hevDropArmtmosphereEndHeight",
+		"_hevDropArmtmosphereStartHeight",
+		"_firstPod"
+	];
 
-		_allHEVsInDrop apply {
-			private _hev = _x;
-			[_hev,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _hev];
-		};
-	},
-	[_allHEVsInDrop,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_allHEVsInDrop select 0],
-	300
-] call CBA_fnc_waitUntilAndExecute;
+	waitUntil {getPosATLVisual (_firstPod select 2) < _hevDropArmtmosphereStartHeight};
 
+	_allHEVsInDrop apply {
+		[_x,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _x];
+		sleep 0.1;
+	};
+};
+/*
+	[	// waitUntil first pod is at the _hevDropArmtmosphereStartHeight
+		{getPosATLVisual (_this select 5) select 2 < (_this select 4)},
+		{	
+			params [
+				["_allHEVsInDrop",[],[[]]],
+				["_playerHEVs",[],[[]]],
+				["_playersInDrop",[],[[]]],
+				["_hevDropArmtmosphereEndHeight",2000,[1]],
+				["_hevDropArmtmosphereStartHeight",3000,[1]]
+			];
+
+			_allHEVsInDrop apply {
+				private _hev = _x;
+				[_hev,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _hev];
+			};
+		},
+		[_allHEVsInDrop,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_allHEVsInDrop select 0],
+		300
+	] call CBA_fnc_waitUntilAndExecute;
+*/
 
 /* ----------------------------------------------------------------------------
 
