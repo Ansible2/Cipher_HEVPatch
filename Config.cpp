@@ -129,6 +129,10 @@ class CfgFunctions
 			{
 				file="Cipher_HEVPatch\Misc\fn_getContainerCargo.sqf";
 			};
+			class hevPatchLog
+			{
+				file="Cipher_HEVPatch\Misc\fn_hevPatchLog.sqf";
+			};
 			class playSound3D
 			{
 				file="Cipher_HEVPatch\Misc\fn_playSound3D.sqf";

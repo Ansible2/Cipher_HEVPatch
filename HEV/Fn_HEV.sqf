@@ -70,7 +70,12 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-if (!isServer) exitWith {false};
+#define HEV_LOG(MESSAGE) ["OPTRE_fnc_HEV",MESSAGE] call OPTRE_fnc_hevPatchLog;
+
+if (!isServer) exitWith {
+	HEV_LOG("Did not execute as machine is not server")
+	false
+};
 
 params	[
 	["_dropPosition",[0,0,0],[[]]],												
@@ -96,21 +101,33 @@ params	[
 	Parameters check
 
 ---------------------------------------------------------------------------- */
-// Ensure atleast someone is alive to drop 
-if ({alive _x} count _units < 1) exitWith {false};
+// Ensure atleast someone is alive to drop
+private _return = _units findIf {alive _x};
+if (_return isEqualTo -1) exitWith {
+	HEV_LOG("Found no units alive, exited")
+	false
+};
 
 // Force HEV dispersion
-if (_randomXYVelocity < 2) then {_randomXYVelocity = 2}; 
+if (_randomXYVelocity < 2) then {
+	HEV_LOG("Found _randomXYVelocity to be less then 2, made it 2")
+	_randomXYVelocity = 2
+}; 
 
 // check if module or script was used and set proper launch delay if not
-if !(_manualDrop) then {_launchDelay = 30};
+if !(_manualDrop) then {
+	HEV_LOG("Not designated manual drop, set _launchDelay to 30")
+	_launchDelay = 30
+};
 
-if (!_manualDrop AND !_deleteChutesOnDetach) then {
+if (!_manualDrop AND {!_deleteChutesOnDetach}) then {
+	HEV_LOG("Not designated manual drop, and _deleteChutesOnDetach was set to false. Set it to true")
 	_deleteChutesOnDetach = true;
 };
 
 // checking if frigate is actually available as it is only in DEV build at the moment
 if (_shipDeployment == "Frigate" AND {!(isClass (configfile >> "CfgVehicles" >> "OPTRE_Frigate_UNSC"))}) then {
+	HEV_LOG("Did not find frigate object loaded, defaulting to Corvette")
 	_shipDeployment = "Corvette";
 };
 
@@ -119,12 +136,14 @@ if (_shipDeployment == "Frigate" AND {!(isClass (configfile >> "CfgVehicles" >> 
 	Spawn HEVs
 
 ---------------------------------------------------------------------------- */
-private ["_allHEVs","_ship"];
+private "_ship";
 
 // spawn HEVs and get their info for the drop. Also creates frigate or corvette
-_allHEVs = call {
+private _dropDataArray = call {
 	_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
 	if (_shipDeployment == "corvette") exitWith {
+		HEV_LOG("Selected Corvette drop")
+
 		private _shipParts = [_dropPosition] call OPTRE_fnc_createCorvette;
 		_ship = _shipParts select 0;
 		_ship setVariable ["OPTRE_shipParts",_shipParts];
@@ -135,6 +154,8 @@ _allHEVs = call {
 	};
 
 	if (_shipDeployment == "frigate") exitWith {
+		HEV_LOG("Selected Frigate drop")
+
 		_ship = "OPTRE_Frigate_UNSC" createVehicle [0,0,0];	
 		_ship setVariable ["OPTRE_shipParts",[_ship]];
 		_ship setPosATL _dropPosition;
@@ -146,6 +167,8 @@ _allHEVs = call {
 	};
 
 	if (_shipDeployment == "No Ship") exitWith {
+		HEV_LOG("Selected No Ship drop")
+
 		// this is a dummy ship used to attach the HEVs to so that they do not fall before launch
 		private _logicCenter = createCenter sideLogic;
 		private _logicGroup = createGroup _logicCenter;
@@ -159,6 +182,8 @@ _allHEVs = call {
 	};
 	// no ship custom spawns units at requested drop zone instead of directly above their position 
 	if (_shipDeployment == "No Ship Custom") exitWith {
+		HEV_LOG("Selected No Ship Custom drop")
+
 		// this is a dummy ship used to attach the HEVs to so that they do not fall before launch
 		private _logicCenter = createCenter sideLogic;
 		private _logicGroup = createGroup _logicCenter;
@@ -172,17 +197,20 @@ _allHEVs = call {
 	};
 
 	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Ship"} AND {_shipDeployment != "Frigate"} AND {_shipDeployment != "No Ship Custom"}) exitWith {
+		HEV_LOG(["Unsuported drop type",_shipdeployment,"used"])
 		"Unsupported STRING entry for _shipDeployment parameter" call BIS_fnc_error;
 		false
 	};
 };
 
-// sort _allHEVs data from spawn script
-private _hevArray = _allHEVs select 0;
-private _hevArrayPlayer = _allHEVs select 1;	
-private _hevArrayAi = _allHEVs select 2;		
-private _listOfPlayers = _allHEVs select 3;		
-private _listOfAi = _allHEVs select 4;	
+// sort _dropDataArray data from spawn script
+private _allHEVsInDrop = _dropDataArray select 0;
+private _playerHEVs = _dropDataArray select 1;	
+private _aiHEVs = _dropDataArray select 2;// not used ???		
+private _playersInDrop = _dropDataArray select 3;		
+private _aiInDrop = _dropDataArray select 4; // not used ???
+
+HEV_LOG(["Found players in drop:",_playerHEVs])
 
 
 /* ----------------------------------------------------------------------------
@@ -196,14 +224,18 @@ missionNamespace setVariable ["OPTRE_HEVLaunchNumber",_HEVLaunchNumber + 1];
 private _HEVLaunchNumbertring = str _HEVLaunchNumber;
 private _countDownDoneEventString = ["OPTRE_HEV_countDownDoneEvent",_HEVLaunchNumbertring] joinString "_";
 
+HEV_LOG(["HEV launch number is:",_HEVLaunchNumbertring,"Count down done event string is:",_countDownDoneEventString])
+
 
 //// Determine need for player scripts or just AI
 
 // if there are no players, just launch pods after delay
-if (count _listOfPlayers < 1) then {
+if !(_playersInDrop isEqualTo []) then {
+	HEV_LOG("No Players found in drop, going to server event")
 
 	[
 		{
+			HEV_LOG(["Server event",_countDownDoneEventString,"sent. Countdown done"])
 			[_this select 0] call CBA_fnc_serverEvent;
 		},
 		[_countDownDoneEventString],
@@ -212,11 +244,19 @@ if (count _listOfPlayers < 1) then {
 
 // if there are players:
 } else {
-	
+	HEV_LOG("Players found in drop")
 	// call countdown function on all players who will drop
-	[_launchDelay,"Launch In",_listOfPlayers,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_CountDown",_listOfPlayers];
+	[_launchDelay,"Launch In",_playersInDrop,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_CountDown",_playersInDrop];
 	
 	{
+		null = [_x,_forEachIndex,_launchDelay] spawn {
+			params ["_hev","_launchIndex","_launchDelay"];
+
+			waitUntil {
+				sleep 0.1;
+				!isNull (gunner _hev)
+			};
+		};
 		[
 			{!isNull (gunner (_this select 0))},
 			{
@@ -227,7 +267,7 @@ if (count _listOfPlayers < 1) then {
 				];
 				private _gunner = gunner _hev;
 
-				if (_gunner in (call CBA_fnc_players)) then {
+				if (_gunner in allPlayers) then {
 					[_launchIndex,_launchDelay,_gunner] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_PlayTones",_gunner];
 				};
 			},
@@ -235,7 +275,7 @@ if (count _listOfPlayers < 1) then {
 			300
 		] call CBA_fnc_waitUntilAndExecute;
 
-	} forEach _hevArray;
+	} forEach _allHEVsInDrop;
 	
 };
 
@@ -246,22 +286,22 @@ if (count _listOfPlayers < 1) then {
 	
 ---------------------------------------------------------------------------- */
 // Server event fires when count down is complete
-private _lastPod = _hevArray select ((count _hevArray) - 1);
+private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 [
 	_countDownDoneEventString, 
 	{
 
 		_thisArgs params [
-			["_hevArray",[],[[]]],
-			["_hevArrayPlayer",[],[[]]],
-			["_randomXYVelocity",1,[1]],
-			["_launchSpeed",1,[1]],
-			["_listOfPlayers",[],[[]]],
-			["_hevDropArmtmosphereStartHeight",3000,[1]],
-			["_ship",objNull,[objNull]],
-			["_deleteShip",true,[true]],
-			["_lastPod",objNull,[objNull]],
-			["_HEVLaunchNumber",1,[1]]
+			"_allHEVsInDrop",
+			"_playerHEVs",
+			"_randomXYVelocity",
+			"_launchSpeed",
+			"_playersInDrop",
+			"_hevDropArmtmosphereStartHeight",
+			"_ship",
+			"_deleteShip",
+			"_lastPod",
+			"_HEVLaunchNumber"
 		];
 
 		{
@@ -269,14 +309,14 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 				{
 					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner (_this select 0)];
 				},
-				[_x,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_listOfPlayers,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
+				[_x,_playerHEVs,_randomXYVelocity,_launchSpeed,_playersInDrop,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
 				_forEachIndex * 0.35
 			] call CBA_fnc_waitAndExecute;
-		} forEach _hevArray;
+		} forEach _allHEVsInDrop;
 
 		[_thisType, _thisId] call CBA_fnc_removeEventHandler;
 	}, 
-	[_hevArray,_hevArrayPlayer,_randomXYVelocity,_launchSpeed,_listOfPlayers,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber]
+	[_allHEVsInDrop,_playerHEVs,_randomXYVelocity,_launchSpeed,_playersInDrop,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber]
 ] call CBA_fnc_addEventHandlerArgs;
 
 
@@ -289,19 +329,19 @@ private _lastPod = _hevArray select ((count _hevArray) - 1);
 	{getPosATLVisual (_this select 5) select 2 < (_this select 4)},
 	{	
 		params [
-			["_hevArray",[],[[]]],
-			["_hevArrayPlayer",[],[[]]],
-			["_listOfPlayers",[],[[]]],
+			["_allHEVsInDrop",[],[[]]],
+			["_playerHEVs",[],[[]]],
+			["_playersInDrop",[],[[]]],
 			["_hevDropArmtmosphereEndHeight",2000,[1]],
 			["_hevDropArmtmosphereStartHeight",3000,[1]]
 		];
 
-		_hevArray apply {
+		_allHEVsInDrop apply {
 			private _hev = _x;
-			[_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _hev];
+			[_hev,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _hev];
 		};
 	},
-	[_hevArray,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_hevArray select 0],
+	[_allHEVsInDrop,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_allHEVsInDrop select 0],
 	300
 ] call CBA_fnc_waitUntilAndExecute;
 
@@ -317,14 +357,14 @@ private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
 
 [
 	{
-		private _hevArray = _this deleteAt 0;
+		private _allHEVsInDrop = _this deleteAt 0;
 		
-		_hevArray apply {
+		_allHEVsInDrop apply {
 			private _hev = _x;
 			([_hev] + _this) remoteExecCall ["OPTRE_fnc_HEVChuteDeploy",gunner _hev];
 		};
 	},
-	[_hevArray,_hevArrayPlayer,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumbertring,_chuteArrayEventString],
+	[_allHEVsInDrop,_playerHEVs,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumbertring,_chuteArrayEventString],
 	5
 ] call CBA_fnc_waitAndExecute;
 
@@ -381,12 +421,12 @@ private _chuteArrayEventID = [
 	_handleLandingEventString, 
 	{
 		_thisArgs params [
-			["_hevArray",[],[[]]],
+			["_allHEVsInDrop",[],[[]]],
 			["_chuteDeployHeight",1000,[123]]
 		];
 
 		
-		_hevArray apply {
+		_allHEVsInDrop apply {
 			private _hev = _x;
 			[_hev,_chuteDeployHeight] remoteExecCall ["OPTRE_fnc_HEVHandleLanding",gunner _hev];
 		};
@@ -394,7 +434,7 @@ private _chuteArrayEventID = [
 
 		[_thisType, _thisId] call CBA_fnc_removeEventHandler;
 	}, 
-	[_hevArray,_chuteDeployHeight]
+	[_allHEVsInDrop,_chuteDeployHeight]
 ] call CBA_fnc_addEventHandlerArgs;
 
 /* ----------------------------------------------------------------------------
@@ -428,11 +468,11 @@ if (!isNull _ship AND {_deleteShip}) then {
 // delete clutter
 private _deleteReadyString = ["OPTRE_HEV_deleteReady",str _HEVLaunchNumber] joinString "_";
 [	
-	// first condition: if any in _hevArray have Z velocity wait, the secondary condition variable is so that it is not deleted when pods are hanging waiting for the drop
+	// first condition: if any in _allHEVsInDrop have Z velocity wait, the secondary condition variable is so that it is not deleted when pods are hanging waiting for the drop
 	{(((_this select 0) findIf {((velocity _x) select 2) != 0}) isEqualTo -1) AND {missionNamespace getVariable [_this select 4,false]}},
 	{
 		params [
-			["_hevArray",[],[[]]],
+			["_allHEVsInDrop",[],[[]]],
 			["_chuteArrayVarString","",[""]],
 			["_deleteChutesOnDetach",false,[true]],
 			["_deleteHEVsAfter",600,[123]]
@@ -443,9 +483,9 @@ private _deleteReadyString = ["OPTRE_HEV_deleteReady",str _HEVLaunchNumber] join
 			missionNamespace setVariable [_chuteArrayVarString,nil];
 		};
 
-		[_hevArray,_deleteHEVsAfter] spawn OPTRE_fnc_HEVCleanUp;
+		[_allHEVsInDrop,_deleteHEVsAfter] spawn OPTRE_fnc_HEVCleanUp;
 	},
-	[_hevArray,_chuteArrayVarString,_deleteChutesOnDetach,_deleteHEVsAfter,_deleteReadyString],
+	[_allHEVsInDrop,_chuteArrayVarString,_deleteChutesOnDetach,_deleteHEVsAfter,_deleteReadyString],
 	300
 ] call CBA_fnc_waitUntilAndExecute;
 
