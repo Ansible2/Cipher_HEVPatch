@@ -152,7 +152,8 @@ private "_ship";
 
 // spawn HEVs and get their info for the drop. Also creates frigate or corvette
 private _dropDataArray = call {
-	_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
+	_dropPosition set [2,_startHeight];
+	//_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
 	if (_shipDeployment == "corvette") exitWith {
 		HEV_LOG("Selected Corvette drop")
 
@@ -266,7 +267,7 @@ if !(_playersInDrop isEqualTo []) then {
 
 			waitUntil {
 				sleep 0.1;
-				if !(isNull gunner _hev) exitWith {true};
+				if !(isNull (gunner _hev)) exitWith {true};
 				false
 			};
 
