@@ -62,7 +62,6 @@ null = switch _mode do {
 	};
 	
 	case 1: {
-		
 		_hev animate ["main_door_rotation", 1]; 
 		_hev animate ["left_door_rotation", 1]; 
 		_hev animate ["right_door_rotation", 1];

@@ -90,10 +90,15 @@ params	[
 	["_manualDrop",false,[true]]													
 ];
 
+
+/* ----------------------------------------------------------------------------
+
+	Parameters check
+
+---------------------------------------------------------------------------- */
 // Ensure atleast someone is alive to drop 
 if ({alive _x} count _units < 1) exitWith {false};
 
-//// Ensure parameters
 // Force HEV dispersion
 if (_randomXYVelocity < 2) then {_randomXYVelocity = 2}; 
 
@@ -237,7 +242,7 @@ if (count _listOfPlayers < 1) then {
 
 /* ----------------------------------------------------------------------------
 
-	Down Boaster Effects Event
+	Down Booster Effects Event
 	
 ---------------------------------------------------------------------------- */
 // Server event fires when count down is complete

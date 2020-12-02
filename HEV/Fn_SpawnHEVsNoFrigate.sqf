@@ -96,7 +96,7 @@ private _fn_OPTRESpawnHEVs = {
 		_hevArray pushBack _hev;
 		
 		// move the unit into their pod and make them invincible
-		[_unit,_hev] remoteExecCall ["moveIngunner", _unit, false];
+		[_unit,_hev] remoteExecCall ["moveInGunner", _unit, false];
 		[_unit,false] remoteExecCall ["allowDamage", _unit, false];
 		
 		// sort players and AI 

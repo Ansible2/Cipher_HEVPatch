@@ -30,7 +30,6 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-
 params [
 	["_menuInputValues",[],[[]]],
 	["_console",objNull,[objNull]]
@@ -250,7 +249,7 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 					600
 				],
 				OPTRE_CurrentConsole
-			] remoteExec [""OPTRE_Fnc_HEVRoomDynamicSetupGrabUnits"", 2, false];} else {playSound 'FD_CP_Not_Clear_F';
+			] remoteExec [""OPTRE_Fnc_HEVRoomDynamicSetupGrabUnits"", 2, false];} else {playSound 'FD_CP_Not_Clear_F'};
 	};";
 
 -------------------------------------------------------------------------*/
