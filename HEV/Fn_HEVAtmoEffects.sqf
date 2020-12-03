@@ -9,10 +9,8 @@ Description:
 
 Parameters:
 	0: _hev <OBJECT> - The HEV to play the effect on.
-    1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
-    2: _listOfPlayers <ARRAY> - The list of players participating in drop.
-    3: _hevDropArmtmosphereEndHeight <NUMBER> - The height at which effects will end.
-    4: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which effects will start.
+    1: _hevDropArmtmosphereEndHeight <NUMBER> - The height at which effects will end.
+    2: _hevDropArmtmosphereStartHeight <NUMBER> - The height at which effects will start.
 
 Returns:
 	NOTHING
@@ -30,8 +28,6 @@ Author:
 ---------------------------------------------------------------------------- */
 params [
     ["_hev",objNull,[objNull]],
-    ["_hevArrayPlayer",[],[[]]],
-    ["_listOfPlayers",[],[[]]],
     ["_hevDropArmtmosphereEndHeight",2000,[1]],
     ["_hevDropArmtmosphereStartHeight",3000,[1]]
 ];
@@ -43,27 +39,40 @@ if (!alive _hev) exitWith {};
     {
         params [
             ["_hev",objNull,[objNull]],
-            ["_hevArrayPlayer",[],[[]]],
-            ["_listOfPlayers",[],[[]]],
             ["_hevDropArmtmosphereEndHeight",2000,[1]],
             ["_hevDropArmtmosphereStartHeight",3000,[1]]
-        ]; 
+        ];
+
+        private _players = call CBA_fnc_players; 
 
         private _light = "#lightpoint" createVehicle [0,0,0];
+        _light attachTo [_hev, [0,1.5,-2]];
         // update effects for all players (local commands used)
-        [1,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",_listOfPlayers];
+        [1,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",_players];
             
         private _fire = "#particlesource" createVehicle [0,0,0]; 
-        _fire setParticleClass "IncinerateFire";
-        _fire attachto [ _hev, [0,0,-2]];
+        _fire attachto [_hev, [0,0,-2]];
+        [_fire,"IncinerateFire"] remoteExecCall ["setParticleClass",_players];
 
-        private _atmoEffects = [_fire,_light];
-
-        if (_hev in _hevArrayPlayer AND {alive (gunner _hev)}) then { 
+        private _hevPilot = gunner _hev;
+        if (alive _hevPilot AND {_hevPilot in _players}) then { 
             [40, _hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds; 
         };
 
+        
         // waitUntil HEV is at _hevDropArmtmosphereEndHeight to delete
+        null = [_hev,_hevDropArmtmosphereEndHeight,[_fire,_light]] spawn {
+            params ["_hev","_hevDropArmtmosphereEndHeight","_atmoEffects"];
+            waitUntil {
+                (getPosATLVisual _hev) select 2 < _hevDropArmtmosphereEndHeight
+            };
+
+            _atmoEffects apply {deleteVehicle _x};
+        };
+
+        /*
+        // waitUntil HEV is at _hevDropArmtmosphereEndHeight to delete
+        private _atmoEffects = [_fire,_light];
         [
             {getPosATLVisual (_this select 0) select 2 < _this select 1},
             {
@@ -72,7 +81,8 @@ if (!alive _hev) exitWith {};
             [_hev,_hevDropArmtmosphereEndHeight,_atmoEffects],
             300
         ] call CBA_fnc_waitUntilAndExecute;
+        */
     },
-    [_hev,_hevArrayPlayer,_listOfPlayers,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight],
+    [_hev,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight],
     300
 ] call CBA_fnc_waitUntilAndExecute;

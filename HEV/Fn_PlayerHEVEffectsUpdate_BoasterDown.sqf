@@ -28,6 +28,8 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+#define HEV_LOG(MESSAGE) ["OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown",MESSAGE] call OPTRE_fnc_hevPatchLog;
+
 if !(hasInterface) exitWith {};
 
 params [
@@ -52,7 +54,16 @@ addCamShake [11, 16, 32];
 
 playSound ["OPTRE_Sounds_Engine",true];																									
 
-// atmo entry camera shake (needs to be migrated to a better spot in main script)
+// atmo entry camera shake 
+null = [_hev,_hevDropArmtmosphereStartHeight] spawn {
+	params ["_hev","_hevDropArmtmosphereStartHeight"];
+	waitUntil {
+		(getPosATLVisual _hev) select 2 < _hevDropArmtmosphereStartHeight	
+	};
+
+	addCamShake [1, 999, 11];
+};
+/*
 [
 	{(getPosATLVisual (_this select 0)) select 2 < (_this select 1)},
 	{
@@ -61,6 +72,7 @@ playSound ["OPTRE_Sounds_Engine",true];
 	[_hev,_hevDropArmtmosphereStartHeight],
 	300
 ] call CBA_fnc_waitUntilAndExecute;
+*/
 
 // this logic is used to play the wind sound using say2D so that the logic can be deleted at anytime, stopping the sound
 private _logicCenter = createCenter sideLogic;

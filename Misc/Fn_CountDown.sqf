@@ -29,23 +29,25 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+#define HEV_LOG(MESSAGE) ["OPTRE_fnc_countDown",MESSAGE] call OPTRE_fnc_hevPatchLog;
 
 if (!hasInterface) exitWith {};
 
 params [
 	["_timeTotal",30,[123]],
 	["_text","Launch In",[""]],
-	["_listOfPlayers",[],[[]]],
+	"_firstPlayerUnit",
 	["_countDownDoneEventString","",[""]]
 ];
+
+HEV_LOG("Starting countdown")
 
 for "_i" from 0 to _timeTotal do {
 	[
 		{
 			params [
 				["_timeTotal",1,[1]],
-				["_text","Launch In",[""]],
-				["_listOfPlayers",[],[[]]]
+				["_text","Launch In",[""]]
 			];
 				
 			if (_timeTotal > 1) then {
@@ -57,31 +59,36 @@ for "_i" from 0 to _timeTotal do {
 			if (_timeTotal isEqualTo 0) then {
 				playSound "FD_Start_F";
 				missionNamespace setVariable ["OPTRE_HEV_DRP_RDY",true];
+				HEV_LOG("Countdown is done")
 			};
 		},
-		[_timeTotal,_text,_listOfPlayers],
+		[_timeTotal,_text],
 		_i
 	] call CBA_fnc_waitAndExecute;
 	_timeTotal = _timeTotal - 1;
 }; 
 
+HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
 //Try changing this to be the _hev's namespace again
 [
 	{missionNamespace getVariable ["OPTRE_HEV_DRP_RDY",false]},
 	{
+		HEV_LOG("OPTRE_HEV_DRP_RDY is now true")
 		[
 			{
 				params [
 					["_text","Launch In",[""]],
-					["_listOfPlayers",[],[[]]],
+					"_firstPlayerUnit",
 					["_countDownDoneEventString","",[""]]
 				];
 
+			
 				missionNamespace setVariable ["OPTRE_HEV_DRP_RDY",false];
 
 				[(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",0,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
 
-				if (local (_listOfPlayers select 0)) then {
+				if (local _firstPlayerUnit) then {
+					HEV_LOG(["Local first player, sending",_countDownDoneEventString,"to server"])
 					[_countDownDoneEventString] call CBA_fnc_serverEvent;
 				};
 			},
@@ -89,6 +96,6 @@ for "_i" from 0 to _timeTotal do {
 			0.9
 		] call CBA_fnc_waitAndExecute;
 	},
-	[_text,_listOfPlayers,_countDownDoneEventString],
+	[_text,_firstPlayerUnit,_countDownDoneEventString],
 	300
 ] call CBA_fnc_waitUntilAndExecute;

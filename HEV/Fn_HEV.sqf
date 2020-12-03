@@ -259,7 +259,7 @@ if !(_playersInDrop isEqualTo []) then {
 } else {
 	HEV_LOG("Players found in drop")
 	// call countdown function on all players who will drop
-	[_launchDelay,"Launch In",_playersInDrop,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_CountDown",_playersInDrop];
+	[_launchDelay,"Launch In",_playersInDrop select 0,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_countDown",_playersInDrop];
 	
 	{
 		null = [_x,_forEachIndex,_launchDelay] spawn {
@@ -311,14 +311,12 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 [
 	_countDownDoneEventString, 
 	{
-		HEV_LOG("Executing countdown done server event")
+		HEV_LOG("Executing the countdown done server event")
 
 		_thisArgs params [
 			"_allHEVsInDrop",
-			"_playerHEVs",
 			"_randomXYVelocity",
 			"_launchSpeed",
-			"_playersInDrop",
 			"_hevDropArmtmosphereStartHeight",
 			"_ship",
 			"_deleteShip",
@@ -330,15 +328,16 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 			[
 				{
 					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner (_this select 0)];
+					HEV_LOG(["Sent booster down to HEV",_this select 0])
 				},
-				[_x,_playerHEVs,_randomXYVelocity,_launchSpeed,_playersInDrop,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
+				[_x,_randomXYVelocity,_launchSpeed,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
 				_forEachIndex * DROP_TIME_BUFFER // provide a buffer between each pods drop
 			] call CBA_fnc_waitAndExecute;
 		} forEach _allHEVsInDrop;
 
 		[_thisType, _thisId] call CBA_fnc_removeEventHandler;
 	}, 
-	[_allHEVsInDrop,_playerHEVs,_randomXYVelocity,_launchSpeed,_playersInDrop,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber]
+	[_allHEVsInDrop,_randomXYVelocity,_launchSpeed,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber]
 ] call CBA_fnc_addEventHandlerArgs;
 
 
@@ -347,20 +346,18 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 	Atmosphere Entry Effects
 	
 ---------------------------------------------------------------------------- */
-null = [_allHEVsInDrop,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight,_allHEVsInDrop select 0] spawn {
+null = [_allHEVsInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] spawn {
 	params [
 		"_allHEVsInDrop",
-		"_playerHEVs",
-		"_playersInDrop",
 		"_hevDropArmtmosphereEndHeight",
-		"_hevDropArmtmosphereStartHeight",
-		"_firstPod"
+		"_hevDropArmtmosphereStartHeight"
 	];
-
+	
+	private _firstPod = _allHEVsInDrop select 0;
 	waitUntil {getPosATLVisual (_firstPod select 2) < _hevDropArmtmosphereStartHeight};
 
 	_allHEVsInDrop apply {
-		[_x,_playerHEVs,_playersInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExec ["OPTRE_fnc_HEVAtmoEffects",gunner _x];
+		[_x,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHeight] remoteExecCall ["OPTRE_fnc_HEVAtmoEffects",gunner _x];
 		sleep 0.1;
 	};
 };
