@@ -35,7 +35,7 @@ params [
 if (!alive _hev) exitWith {};
 
 [	// waitUntil pod is below _hevDropArmtmosphereStartHeight
-    {getPosATLVisual (_this select 0) select 2 < _this select 4},
+    {getPosATLVisual (_this select 0) select 2 < (_this select 4)},
     {
         params [
             ["_hev",objNull,[objNull]],
@@ -43,19 +43,17 @@ if (!alive _hev) exitWith {};
             ["_hevDropArmtmosphereStartHeight",3000,[1]]
         ];
 
-        private _players = call CBA_fnc_players; 
-
         private _light = "#lightpoint" createVehicle [0,0,0];
         _light attachTo [_hev, [0,1.5,-2]];
         // update effects for all players (local commands used)
-        [1,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",_players];
+        [1,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",-2];
             
         private _fire = "#particlesource" createVehicle [0,0,0]; 
         _fire attachto [_hev, [0,0,-2]];
-        [_fire,"IncinerateFire"] remoteExecCall ["setParticleClass",_players];
+        [_fire,"IncinerateFire"] remoteExecCall ["setParticleClass",-2];
 
         private _hevPilot = gunner _hev;
-        if (alive _hevPilot AND {_hevPilot in _players}) then { 
+        if (alive _hevPilot AND {isPlayer _hevPilot}) then { 
             [40, _hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds; 
         };
 
@@ -63,8 +61,11 @@ if (!alive _hev) exitWith {};
         // waitUntil HEV is at _hevDropArmtmosphereEndHeight to delete
         null = [_hev,_hevDropArmtmosphereEndHeight,[_fire,_light]] spawn {
             params ["_hev","_hevDropArmtmosphereEndHeight","_atmoEffects"];
+            
             waitUntil {
-                (getPosATLVisual _hev) select 2 < _hevDropArmtmosphereEndHeight
+                if ((getPosATLVisual _hev) select 2 < _hevDropArmtmosphereEndHeight) exitWith {true};
+                sleep 0.1;
+                false
             };
 
             _atmoEffects apply {deleteVehicle _x};

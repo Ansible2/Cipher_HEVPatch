@@ -3,7 +3,7 @@ params [
 	["_message",[],[[],""]]
 ];
 
-diag_log "Hev Patch Log......: " + _scriptName;
+diag_log ("Hev Patch Log......: " + _scriptName);
 if (_message isEqualType []) then {
 	_message = _message joinString " ";
 };

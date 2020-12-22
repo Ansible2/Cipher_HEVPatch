@@ -58,7 +58,9 @@ playSound ["OPTRE_Sounds_Engine",true];
 null = [_hev,_hevDropArmtmosphereStartHeight] spawn {
 	params ["_hev","_hevDropArmtmosphereStartHeight"];
 	waitUntil {
-		(getPosATLVisual _hev) select 2 < _hevDropArmtmosphereStartHeight	
+		if ((getPosATLVisual _hev) select 2 < _hevDropArmtmosphereStartHeight) exitWith {true};
+		sleep 0.1;
+		false	
 	};
 
 	addCamShake [1, 999, 11];
@@ -92,14 +94,14 @@ _logic attachTo [_hev,[0,0,0]];
 	{	deleteVehicle ((_this getVariable "params") select 2);	},
 	
 	{
-		_hev = (_this getVariable "params") select 0;
+		private _hev = (_this getVariable "params") select 0;
 		_hevDropArmtmosphereStartHeight = (_this getVariable "params") select 1;
 
 		(	(getPosATLVisual _hev) select 2 < _hevDropArmtmosphereStartHeight	)
 	},
 	
 	{
-		_hev = (_this getVariable "params") select 0;
+		private _hev = (_this getVariable "params") select 0;
 
 		(	!alive (gunner _hev) OR {(getPosATL _hev) select 2 < 20} OR {(velocity _hev) select 2 isEqualTo 0}	)
 	}

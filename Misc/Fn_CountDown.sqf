@@ -29,7 +29,8 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define HEV_LOG(MESSAGE) ["OPTRE_fnc_countDown",MESSAGE] call OPTRE_fnc_hevPatchLog;
+#define SCRIPT_NAME "OPTRE_fnc_countDown"
+#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
 
 if (!hasInterface) exitWith {};
 
@@ -88,7 +89,7 @@ HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
 				[(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",0,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
 
 				if (local _firstPlayerUnit) then {
-					HEV_LOG(["Local first player, sending",_countDownDoneEventString,"to server"])
+					[SCRIPT_NAME,["Local first player, sending",_countDownDoneEventString,"to server"]] call OPTRE_fnc_hevPatchLog;
 					[_countDownDoneEventString] call CBA_fnc_serverEvent;
 				};
 			},

@@ -73,7 +73,7 @@ for "_y" from 0 to _numberOfColumns do {
 	
 	for "_i" from 1 to _rowNumber do {
 		private _position = _startPosLeft getPos [_i*3,_direction];
-		private _podVariableName = [_variablePrefix, str _podNumber] joinString "";
+		private _podVariableName = [_variablePrefix,_podNumber] joinString "";
 		_podNumber = _podNumber + 1;
 		private _pod = create3DENEntity ["Object","OPTRE_HEV",_position,true];
 		_pod set3DENAttribute ["Rotation",[0,0,_dirRight]]; 
@@ -90,7 +90,7 @@ for "_y" from 0 to _numberOfColumns do {
 	};
 	for "_i" from 1 to _rowNumber do {
 		private _position = _startPosRight getPos [_i*3,_direction];
-		private _podVariableName = [_variablePrefix, str _podNumber] joinString "";
+		private _podVariableName = [_variablePrefix,_podNumber] joinString "";
 		_podNumber = _podNumber + 1;
 		private _pod = create3DENEntity ["Object","OPTRE_HEV",_position,true];
 		_pod set3DENAttribute ["Rotation",[0,0,_dirLeft]]; 

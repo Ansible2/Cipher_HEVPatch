@@ -80,8 +80,8 @@ Author:
 */
 
 
-
-#define HEV_LOG(MESSAGE) ["OPTRE_fnc_HEV",MESSAGE] call OPTRE_fnc_hevPatchLog;
+#define SCRIPT_NAME "OPTRE_fnc_HEV"
+#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
 #define DROP_TIME_BUFFER 0.35
 
 if (!isServer) exitWith {
@@ -210,7 +210,7 @@ private _dropDataArray = call {
 	};
 
 	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Ship"} AND {_shipDeployment != "Frigate"} AND {_shipDeployment != "No Ship Custom"}) exitWith {
-		HEV_LOG(["Unsuported drop type",_shipdeployment,"used"])
+		[SCRIPT_NAME,["Unsuported drop type",_shipdeployment,"used"]] call OPTRE_fnc_hevPatchLog;
 		"Unsupported STRING entry for _shipDeployment parameter" call BIS_fnc_error;
 		false
 	};
@@ -223,8 +223,7 @@ private _aiHEVs = _dropDataArray select 2;// not used ???
 private _playersInDrop = _dropDataArray select 3;		
 private _aiInDrop = _dropDataArray select 4; // not used ???
 
-HEV_LOG(["Found players in drop:",_playerHEVs])
-
+[SCRIPT_NAME,["Found players in drop:",_playerHEVs]] call OPTRE_fnc_hevPatchLog;
 
 /* ----------------------------------------------------------------------------
 
@@ -234,10 +233,10 @@ HEV_LOG(["Found players in drop:",_playerHEVs])
 // Prepare unique strings for events, this is so multiple drops can happen at once
 private _HEVLaunchNumber = missionNamespace getVariable ["OPTRE_HEVLaunchNumber",1];
 missionNamespace setVariable ["OPTRE_HEVLaunchNumber",_HEVLaunchNumber + 1];
-private _HEVLaunchNumbertring = str _HEVLaunchNumber;
-private _countDownDoneEventString = ["OPTRE_HEV_countDownDoneEvent",_HEVLaunchNumbertring] joinString "_";
+private _HEVLaunchNumberString = str _HEVLaunchNumber;
+private _countDownDoneEventString = ["OPTRE_HEV_countDownDoneEvent",_HEVLaunchNumberString] joinString "_";
 
-HEV_LOG(["HEV launch number is:",_HEVLaunchNumbertring,"Count down done event string is:",_countDownDoneEventString])
+[SCRIPT_NAME,["HEV launch number is:",_HEVLaunchNumberString,"Count down done event string is:",_countDownDoneEventString]] call OPTRE_fnc_hevPatchLog;
 
 
 //// Determine need for player scripts or just AI
@@ -248,7 +247,8 @@ if !(_playersInDrop isEqualTo []) then {
 
 	[
 		{
-			HEV_LOG(["Server event",_countDownDoneEventString,"sent. Countdown done"])
+			[SCRIPT_NAME,["Server event",_countDownDoneEventString,"sent. Countdown done"]] call OPTRE_fnc_hevPatchLog;
+
 			[_this select 0] call CBA_fnc_serverEvent;
 		},
 		[_countDownDoneEventString],
@@ -259,7 +259,8 @@ if !(_playersInDrop isEqualTo []) then {
 } else {
 	HEV_LOG("Players found in drop")
 	// call countdown function on all players who will drop
-	[_launchDelay,"Launch In",_playersInDrop select 0,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_countDown",_playersInDrop];
+	private _firstPlayerInDrop = _playersInDrop select 0;
+	[_launchDelay,"Launch In",_firstPlayerInDrop,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_countDown",_playersInDrop];
 	
 	{
 		null = [_x,_forEachIndex,_launchDelay] spawn {
@@ -327,8 +328,11 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 		{
 			[
 				{
-					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner (_this select 0)];
-					HEV_LOG(["Sent booster down to HEV",_this select 0])
+					private _hev = _this select 0;
+
+					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner _hev];
+					
+					[SCRIPT_NAME,["Sent booster down to HEV",_hev]] call OPTRE_fnc_hevPatchLog;
 				},
 				[_x,_randomXYVelocity,_launchSpeed,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
 				_forEachIndex * DROP_TIME_BUFFER // provide a buffer between each pods drop
@@ -388,8 +392,8 @@ null = [_allHEVsInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHe
 	Chute Open
 	
 ---------------------------------------------------------------------------- */
-private _handleLandingEventString = ["OPTRE_HEV_handleLanding",_HEVLaunchNumbertring] joinString "_";
-private _chuteArrayVarString = ["OPTRE_HEV_chuteArray",_HEVLaunchNumbertring] joinString "_";
+private _handleLandingEventString = ["OPTRE_HEV_handleLanding",_HEVLaunchNumberString] joinString "_";
+private _chuteArrayVarString = ["OPTRE_HEV_chuteArray",_HEVLaunchNumberString] joinString "_";
 private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
 
 [
@@ -401,7 +405,7 @@ private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
 			([_hev] + _this) remoteExecCall ["OPTRE_fnc_HEVChuteDeploy",gunner _hev];
 		};
 	},
-	[_allHEVsInDrop,_playerHEVs,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumbertring,_chuteArrayEventString],
+	[_allHEVsInDrop,_playerHEVs,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumberString,_chuteArrayEventString],
 	5
 ] call CBA_fnc_waitAndExecute;
 
