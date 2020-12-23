@@ -55,7 +55,7 @@ for "_i" from 0 to _timeTotal do {
 				playSound "FD_Finish_F"; 
 			};
 			 
-			[(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",_timeTotal,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
+			null = [(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",_timeTotal,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
 				
 			if (_timeTotal isEqualTo 0) then {
 				playSound "FD_Start_F";
@@ -86,7 +86,7 @@ HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
 			
 				missionNamespace setVariable ["OPTRE_HEV_DRP_RDY",false];
 
-				[(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",0,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
+				null = [(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",0,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
 
 				if (local _firstPlayerUnit) then {
 					[SCRIPT_NAME,["Local first player, sending",_countDownDoneEventString,"to server"]] call OPTRE_fnc_hevPatchLog;
@@ -94,7 +94,7 @@ HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
 				};
 			},
 			_this,
-			0.9
+			1
 		] call CBA_fnc_waitAndExecute;
 	},
 	[_text,_firstPlayerUnit,_countDownDoneEventString],

@@ -18,7 +18,7 @@ Returns:
 Examples:
     (begin example)
 
-		[playerHEV_1,[playerHEV_1,playerHEV_2],[player_1,player_2],2000,3000] call OPTRE_fnc_HEVAtmoEffects;
+		[playerHEV_1,2000,3000] call OPTRE_fnc_HEVAtmoEffects;
 
     (end)
 
@@ -26,6 +26,9 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+#define SCRIPT_NAME "OPTRE_fnc_HEVAtmoEffects"
+scriptName SCRIPT_NAME;
+
 params [
     ["_hev",objNull,[objNull]],
     ["_hevDropArmtmosphereEndHeight",2000,[1]],
@@ -43,6 +46,8 @@ if (!alive _hev) exitWith {};
             ["_hevDropArmtmosphereStartHeight",3000,[1]]
         ];
 
+        [SCRIPT_NAME,["Pod is below atmo height",_hevDropArmtmosphereStartHeight,"starting effects"]] call OPTRE_fnc_hevPatchLog;
+
         private _light = "#lightpoint" createVehicle [0,0,0];
         _light attachTo [_hev, [0,1.5,-2]];
         // update effects for all players (local commands used)
@@ -54,6 +59,7 @@ if (!alive _hev) exitWith {};
 
         private _hevPilot = gunner _hev;
         if (alive _hevPilot AND {isPlayer _hevPilot}) then { 
+            [SCRIPT_NAME,["Found alive player in HEV:",_hev,"playing reEntry effects"]] call OPTRE_fnc_hevPatchLog;
             [40, _hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds; 
         };
 
@@ -67,6 +73,8 @@ if (!alive _hev) exitWith {};
                 sleep 0.1;
                 false
             };
+
+            [SCRIPT_NAME,[_hev,"reached end atmo effect height, deleting effects"]] call OPTRE_fnc_hevPatchLog;
 
             _atmoEffects apply {deleteVehicle _x};
         };

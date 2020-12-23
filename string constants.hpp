@@ -1,0 +1,3 @@
+#define HANDLE_LANDING_STRING "OPTRE_HEV_handleLanding"
+#define CHUTE_ARRAY_VAR_STRING "OPTRE_HEV_chuteArray"
+#define DELETE_READY_VAR_STRING "OPTRE_HEV_deleteReady"

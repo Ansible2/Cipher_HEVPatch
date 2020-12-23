@@ -1,3 +1,4 @@
+#include "..\string constants.hpp"
 /* ----------------------------------------------------------------------------
 Function: OPTRE_Fnc_HEV
 
@@ -392,20 +393,27 @@ null = [_allHEVsInDrop,_hevDropArmtmosphereEndHeight,_hevDropArmtmosphereStartHe
 	Chute Open
 	
 ---------------------------------------------------------------------------- */
-private _handleLandingEventString = ["OPTRE_HEV_handleLanding",_HEVLaunchNumberString] joinString "_";
-private _chuteArrayVarString = ["OPTRE_HEV_chuteArray",_HEVLaunchNumberString] joinString "_";
+private _handleLandingEventString = [HANDLE_LANDING_STRING,_HEVLaunchNumberString] joinString "_";
+private _chuteArrayVarString = [CHUTE_ARRAY_STRING,_HEVLaunchNumberString] joinString "_";
 private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
 
 [
 	{
 		private _allHEVsInDrop = _this deleteAt 0;
-		
+		// replace _lastPod with bool
+		private _lastPod = _this select 3;
+		_this set [4,false];
+
 		_allHEVsInDrop apply {
 			private _hev = _x;
+			if (_hev isEqualTo _lastPod) then {
+				_this set [3,true]; 
+			};
+
 			([_hev] + _this) remoteExecCall ["OPTRE_fnc_HEVChuteDeploy",gunner _hev];
 		};
 	},
-	[_allHEVsInDrop,_playerHEVs,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_handleLandingEventString,_HEVLaunchNumberString,_chuteArrayEventString],
+	[_allHEVsInDrop,_chuteDeployHeight,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_HEVLaunchNumberString],
 	5
 ] call CBA_fnc_waitAndExecute;
 
@@ -486,7 +494,7 @@ private _chuteArrayEventID = [
 // delete corvette
 if (!isNull _ship AND {_deleteShip}) then {
 	
-	private _deleteShipString = ["OPTRE_HEV_deleteShipEvent",str _HEVLaunchNumber] joinString "_";
+	private _deleteShipString = ["OPTRE_HEV_deleteShipEvent",_HEVLaunchNumber] joinString "_";
 	[
 		{missionNamespace getVariable [_this select 0,false]},
 		{
@@ -507,7 +515,7 @@ if (!isNull _ship AND {_deleteShip}) then {
 
 
 // delete clutter
-private _deleteReadyString = ["OPTRE_HEV_deleteReady",str _HEVLaunchNumber] joinString "_";
+private _deleteReadyString = [DELETE_READY_VAR_STRING,_HEVLaunchNumber] joinString "_";
 [	
 	// first condition: if any in _allHEVsInDrop have Z velocity wait, the secondary condition variable is so that it is not deleted when pods are hanging waiting for the drop
 	{(((_this select 0) findIf {((velocity _x) select 2) != 0}) isEqualTo -1) AND {missionNamespace getVariable [_this select 4,false]}},

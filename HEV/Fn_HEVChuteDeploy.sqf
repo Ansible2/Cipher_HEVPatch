@@ -1,3 +1,4 @@
+#include "..\string constants.hpp"
 /* ----------------------------------------------------------------------------
 Function: OPTRE_fnc_HEVChuteDeploy
 
@@ -9,17 +10,11 @@ Description:
 
 Parameters:
 	0: _hev <OBJECT> - The HEV being dropped.
-    1: _hevArrayPlayer <ARRAY> - The list of player HEVs participating in drop. 
-    2: _chuteDeployHeight <NUMBER> - The height to deploy chute and slow pod.
-    3: _chuteDetachHeight <NUMBER> - The height to detach chute.
-    4: _deleteChutesOnDetach <BOOL> - Automatically delete chutes after detach?
-    5: _lastPod <OBJECT> - The last pod to be dropped from ship.
-    
-    6: _handleLandingEventString <STRING> - A unique string for this drop's handle landing.
-        This is automatically permuted up to function chain as "OPTRE_HEV_handleLanding" + (the launch number)
-    
-    7: _chuteArrayEventString <STRING> - Another unique string like _handleLandingEventString.
-        This is "OPTRE_HEV_chuteArray" + (the launch number).
+    1: _chuteDeployHeight <NUMBER> - The height to deploy chute and slow pod.
+    2: _chuteDetachHeight <NUMBER> - The height to detach chute.
+    3: _deleteChutesOnDetach <BOOL> - Automatically delete chutes after detach?
+    4: _isLastPod <BOOL> - Is this the last pod in drop?
+    5: _HEVLaunchNumberString <STRING> - The last pod to be dropped from ship.
 
 Returns:
 	NOTHING
@@ -29,7 +24,6 @@ Examples:
 
 		[
             playerHEV_1,
-            [playerHEV_1,playerHEV_2],
             1000,
             500,
             true,
@@ -46,14 +40,11 @@ Author:
 ---------------------------------------------------------------------------- */
 params [
     ["_hev",objNull,[objNull]],
-	["_hevArrayPlayer",[],[[]]],
 	["_chuteDeployHeight",1000,[1]],
 	["_chuteDetachHeight",500,[1]],
 	["_deleteChutesOnDetach",false,[true]],
-	["_lastPod",objNull,[objNull]],
-    ["_handleLandingEventString","",[""]],
-    ["_HEVLaunchNumbertring","",[""]],
-    ["_chuteArrayEventString","",[""]]
+	["_isLastPod",false,[true]],
+    ["_HEVLaunchNumberString","",[""]]
 ];
 
 private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
@@ -63,17 +54,17 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
     {(getPosATLVisual (_this select 0) select 2) <= (_this select 3)},
     {
         params [
-            ["_hev",objNull,[objNull]],
-            ["_hevArrayPlayer",[],[[]]],
-            ["_chute",objNull,[objNull]],
-            ["_chuteDeployHeight",1000,[1]],
-            ["_lastPod",objNull,[objNull]],
-            ["_handleLandingEventString","",[""]]
+            "_hev",
+            "_chute",
+            "_chuteDeployHeight",
+            "_chuteDetachHeight",
+            "_isLastPod",
+            "_HEVLaunchNumberString"
         ];
 
         _chute attachTo [_hev, [0,-0.2,1.961]];;
 
-        if (_hev in _hevArrayPlayer) then {
+        if (isPlayer (gunner _hev)) then {
             [_chute,_hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_Chute;
 
             [_hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_GroundAlarm;
@@ -88,28 +79,27 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
 
         _chute disableCollisionWith _hev;
         
-        if (_hev isEqualTo _lastPod) then {
+        if (_hev isEqualTo _isLastPod) then {
+            private _handleLandingEventString = [HANDLE_LANDING_STRING,_HEVLaunchNumberString] joinString "_";
             [_handleLandingEventString] call CBA_fnc_serverEvent;
         };    
     
     },
-    [_hev,_hevArrayPlayer,_chute,_chuteDeployHeight,_lastPod,_handleLandingEventString],
+    [_hev,_chute,_chuteDeployHeight,_chuteDetachHeight,_isLastPod,_HEVLaunchNumberString],
     300
 ] call CBA_fnc_waitUntilAndExecute;
 
 //chute detach
 [
-    {(getPosATLVisual (_this select 0) select 2) <= (_this select 2)},
-        
+    {(getPosATLVisual (_this select 0) select 2) <= (_this select 2)},   
     {
         params [
-            ["_hev",objNull,[objNull]],
-            ["_chute",objNull,[objNull]],
-            ["_chuteDetachHeight",500,[1]],
-            ["_deleteChutesOnDetach",false,[true]],
-            ["_lastPod",objNull,[objNull]],
-            ["_HEVLaunchNumbertring","",[""]],
-            ["_chuteArrayEventString","",[""]]
+            "_hev",
+            "_chute",
+            "_chuteDetachHeight",
+            "_deleteChutesOnDetach",
+            "_isLastPod",
+            "_HEVLaunchNumbertring"
         ];
 
         detach _chute;
@@ -127,15 +117,17 @@ private _chute = "OPTRE_HEV_Chute" createVehicle [0,0,0];
                 1
             ] call CBA_fnc_waitAndExecute;
         } else {
+            private _chuteArrayVarString = [CHUTE_ARRAY_VAR_STRING,_HEVLaunchNumberString] joinString "_";
+            private _chuteArrayEventString = _chuteArrayVarString + "_addToEvent";
             [_chuteArrayEventString,[_chute]] call CBA_fnc_serverEvent;
         };
 
         
-        if (_hev isEqualTo _lastPod) then {
-            private _deleteReadyString = ["OPTRE_HEV_deleteReady",_HEVLaunchNumbertring] joinString "_";
+        if (_hev isEqualTo _isLastPod) then {
+            private _deleteReadyString = [DELETE_READY_VAR_STRING,_HEVLaunchNumbertring] joinString "_";
             missionNamespace setVariable [_deleteReadyString,true,[0,2] select isMultiplayer];
         };
     },
-    [_hev,_chute,_chuteDetachHeight,_deleteChutesOnDetach,_lastPod,_HEVLaunchNumbertring,_chuteArrayEventString],
+    [_hev,_chute,_chuteDetachHeight,_deleteChutesOnDetach,_isLastPod,_HEVLaunchNumbertring],
     300
 ] call CBA_fnc_waitUntilAndExecute;
