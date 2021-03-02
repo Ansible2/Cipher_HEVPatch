@@ -77,7 +77,7 @@ if !(_advancedMode) then {
 			"", 
 			"podswitch"
 		] 
-	] remoteExec ["addAction",[0,-2] select isDedicated,true];
+	] remoteExecCall ["addAction",[0,-2] select isDedicated,true];
 };
 
 _shipTail setvariable ["OPTRE_Drake_LaunchInTime",_launchTime]; // why?
