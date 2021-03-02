@@ -9,10 +9,9 @@ Description:
 	Modifications: Adapted for use on dedicated servers, improved performance/readability, made execute CBA server event for pods to release 
 
 Parameters:
-
 	0: _timeTotal <NUMBER> - The time for the countdown
 	1: _text <STRING> - What text should apper in front of the countdown number
-	2: _listOfPlayers <ARRAY> - A list of the players participating in the drop
+	2: _firstPlayerUnit <OBJECT> - The first player in the drop
 	3: _countDownDoneEventString <STRING> - The event string to execute on the server upon completion of countdown
 
 Returns:
@@ -29,8 +28,7 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define SCRIPT_NAME "OPTRE_fnc_countDown"
-#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
+scriptName "OPTRE_fnc_countDown"
 
 if (!hasInterface) exitWith {};
 
@@ -41,7 +39,7 @@ params [
 	["_countDownDoneEventString","",[""]]
 ];
 
-HEV_LOG("Starting countdown")
+["Starting countdown",false] call KISKA_fnc_log;
 
 for "_i" from 0 to _timeTotal do {
 	[
@@ -60,7 +58,7 @@ for "_i" from 0 to _timeTotal do {
 			if (_timeTotal isEqualTo 0) then {
 				playSound "FD_Start_F";
 				missionNamespace setVariable ["OPTRE_HEV_DRP_RDY",true];
-				HEV_LOG("Countdown is done")
+				["Countdown is done",false] call KISKA_fnc_log;
 			};
 		},
 		[_timeTotal,_text],
@@ -69,12 +67,12 @@ for "_i" from 0 to _timeTotal do {
 	_timeTotal = _timeTotal - 1;
 }; 
 
-HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
+["OPTRE_HEV_DRP_RDY is now waiting...",false] call KISKA_fnc_log;
 //Try changing this to be the _hev's namespace again
 [
 	{missionNamespace getVariable ["OPTRE_HEV_DRP_RDY",false]},
 	{
-		HEV_LOG("OPTRE_HEV_DRP_RDY is now true")
+		["OPTRE_HEV_DRP_RDY is now true",false] call KISKA_fnc_log;
 		[
 			{
 				params [
@@ -89,7 +87,7 @@ HEV_LOG("Wating for OPTRE_HEV_DRP_RDY")
 				null = [(format ["<t color='#ff0000' size = '.55'>%2: %1</t>",0,_text]),0,1.35,4,1,0/*,789*/] spawn BIS_fnc_dynamicText;
 
 				if (local _firstPlayerUnit) then {
-					[SCRIPT_NAME,["Local first player, sending",_countDownDoneEventString,"to server"]] call OPTRE_fnc_hevPatchLog;
+					[["Local first player, sending: ",_countDownDoneEventString," to server"],false] call KISKA_fnc_log;
 					[_countDownDoneEventString] call CBA_fnc_serverEvent;
 				};
 			},

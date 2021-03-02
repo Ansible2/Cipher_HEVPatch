@@ -1,42 +1,42 @@
 /* ----------------------------------------------------------------------------
-Function: OPTRE_fnc_addContainerCargo
+Function: KISKA_fnc_pasteContainerCargo
 
 Description:
-	Takes a cargo array formatted from OPTRE_fnc_getContainerCargo and adds it to another container.
-	Exact ammo counts will be preserved even inside of an item such as magazines inside of a vest or backpack.
+	Takes a cargo array formatted from KISKA_fnc_copyContainerCargo and adds it to another container.
+	Exact ammo counts will be preserved even inside of an item, such as magazines inside of a vest or backpack.
 
 Parameters:
-
 	0: _containerToLoad <OBJECT> - The container to add the cargo to.
-	1: _cargo <ARRAY> - An array of various items, magazines, and weapons formatted from OPTRE_fnc_getContainerCargo
+	1: _cargo <ARRAY> - An array of various items, magazines, and weapons formatted from KISKA_fnc_copyContainerCargo
 
 Returns:
 	BOOL
 
 Examples:
     (begin example)
-
-		[container,[otherContainer] call OPTRE_fnc_getContainerCargo] call OPTRE_fnc_addContainerCargo;
-
+		[container,([otherContainer] call KISKA_fnc_copyContainerCargo)] call KISKA_fnc_pasteContainerCargo;
     (end)
 
 Author:
 	Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+scriptName "KISKA_fnc_pasteContainerCargo";
+
 params [
 	["_containerToLoad",objNull,[objNull]],
 	["_cargo",[],[[]]]
 ];
 
 if (isNull _containerToLoad) exitWith {
-	"_containerToLoad isNull" call BIS_fnc_error;
+	["_containerToLoad isNull",true] call KISKA_fnc_log;
 	false	
 };
 
 if (_cargo isEqualTo []) exitWith {
-	"_cargo is empty array '[]'" call BIS_fnc_error;
+	["_cargo is empty array '[]'",true] call KISKA_fnc_log;
 	false 
 };
+
 
 // items
 private _items = _cargo select 0;
@@ -46,6 +46,7 @@ if !(_items isEqualTo [[],[]]) then {
 	} forEach (_items select 0);
 };
 
+
 // magazines
 private _magazines = _cargo select 1;
 if !(_magazines isEqualTo []) then {
@@ -53,6 +54,7 @@ if !(_magazines isEqualTo []) then {
 		_containerToLoad addMagazineAmmoCargo [_x select 0,1,_x select 1];
 	};
 };
+
 
 // weapons
 private _weapons = _cargo select 2;
@@ -62,13 +64,15 @@ if !(_weapons isEqualTo []) then {
 	};
 };
 
+
 // backpacks
 private _backpacks = _cargo select 3;
-if !(_backpacks isEqualTo [[],[]]) then {
+if (_backpacks isNotEqualTo [[],[]]) then {
 	{
 		_containerToLoad addBackpackCargoGlobal [_x,(_backpacks select 1) select _forEachIndex];
 	} forEach (_backpacks select 0);
 };
+
 
 // containers within the conatainer (vests, backpacks, etc.)
 private _containers = _cargo select 4;

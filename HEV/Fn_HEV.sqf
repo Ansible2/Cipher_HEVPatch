@@ -10,7 +10,6 @@ Description:
 	Must be executed on server.
 
 Parameters:
-
 	0: _dropPosition <ARRAY> - The postition to initiate the drop, can be either 3D position [0,0,0] or 2D [0,0]
 	
 	1: _units <ARRAY> - The units to teleport to drop pods
@@ -80,13 +79,12 @@ Author:
 	 Have a function that sets these globals and one that deletes them. Both of which would be trigggered by the server.
 */
 
-
-#define SCRIPT_NAME "OPTRE_fnc_HEV"
-#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
 #define DROP_TIME_BUFFER 0.35
+scriptName "OPTRE_fnc_HEV";
 
-if (!isServer) exitWith {
-	HEV_LOG("Did not execute as machine is not server")
+
+if !(isServer) exitWith {
+	["Did not execute as machine is not server",true] call KISKA_fnc_log;
 	false
 };
 
@@ -117,30 +115,30 @@ params	[
 // Ensure atleast someone is alive to drop
 private _return = _units findIf {alive _x};
 if (_return isEqualTo -1) exitWith {
-	HEV_LOG("Found no units alive, exited")
+	["Found no units alive, exited",true] call KISKA_fnc_log;
 	false
 };
 
 // Force HEV dispersion
 if (_randomXYVelocity < 2) then {
-	HEV_LOG("Found _randomXYVelocity to be less then 2, made it 2")
+	["Found _randomXYVelocity to be less then 2, made it 2",false] call KISKA_fnc_log;
 	_randomXYVelocity = 2
 }; 
 
 // check if module or script was used and set proper launch delay if not
 if !(_manualDrop) then {
-	HEV_LOG("Not designated manual drop, set _launchDelay to 30")
+	["Not designated manual drop, set _launchDelay to 30",false] call KISKA_fnc_log;
 	_launchDelay = 30
 };
 
 if (!_manualDrop AND {!_deleteChutesOnDetach}) then {
-	HEV_LOG("Not designated manual drop, and _deleteChutesOnDetach was set to false. Set it to true")
+	["Not designated manual drop, and _deleteChutesOnDetach was set to false. Set it to true...",true] call KISKA_fnc_log;
 	_deleteChutesOnDetach = true;
 };
 
 // checking if frigate is actually available as it is only in DEV build at the moment
 if (_shipDeployment == "Frigate" AND {!(isClass (configfile >> "CfgVehicles" >> "OPTRE_Frigate_UNSC"))}) then {
-	HEV_LOG("Did not find frigate object loaded, defaulting to Corvette")
+	["Did not find frigate object loaded, defaulting to Corvette",true] call KISKA_fnc_log;
 	_shipDeployment = "Corvette";
 };
 
@@ -156,7 +154,7 @@ private _dropDataArray = call {
 	_dropPosition set [2,_startHeight];
 	//_dropPosition = [(_dropPosition select 0), (_dropPosition select 1), _startHeight]; 
 	if (_shipDeployment == "corvette") exitWith {
-		HEV_LOG("Selected Corvette drop")
+		["Selected Corvette drop",false] call KISKA_fnc_log;
 
 		private _shipParts = [_dropPosition] call OPTRE_fnc_createCorvette;
 		_ship = _shipParts select 0;
@@ -168,7 +166,7 @@ private _dropDataArray = call {
 	};
 
 	if (_shipDeployment == "frigate") exitWith {
-		HEV_LOG("Selected Frigate drop")
+		["Selected Frigate drop",false] call KISKA_fnc_log;
 
 		_ship = "OPTRE_Frigate_UNSC" createVehicle [0,0,0];	
 		_ship setVariable ["OPTRE_shipParts",[_ship]];
@@ -181,7 +179,7 @@ private _dropDataArray = call {
 	};
 
 	if (_shipDeployment == "No Ship") exitWith {
-		HEV_LOG("Selected No Ship drop")
+		["Selected No-Ship drop",false] call KISKA_fnc_log;
 
 		// this is a dummy ship used to attach the HEVs to so that they do not fall before launch
 		private _logicCenter = createCenter sideLogic;
@@ -196,7 +194,7 @@ private _dropDataArray = call {
 	};
 	// no ship custom spawns units at requested drop zone instead of directly above their position 
 	if (_shipDeployment == "No Ship Custom") exitWith {
-		HEV_LOG("Selected No Ship Custom drop")
+		["Selected No-Ship-Custom drop",false] call KISKA_fnc_log;
 
 		// this is a dummy ship used to attach the HEVs to so that they do not fall before launch
 		private _logicCenter = createCenter sideLogic;
@@ -211,8 +209,7 @@ private _dropDataArray = call {
 	};
 
 	if (_shipDeployment != "corvette" AND {_shipDeployment != "No Ship"} AND {_shipDeployment != "Frigate"} AND {_shipDeployment != "No Ship Custom"}) exitWith {
-		[SCRIPT_NAME,["Unsuported drop type",_shipdeployment,"used"]] call OPTRE_fnc_hevPatchLog;
-		"Unsupported STRING entry for _shipDeployment parameter" call BIS_fnc_error;
+		[["Unsuported drop type: ",_shipdeployment," used, exiting sequence..."],true] call KISKA_fnc_log;
 		false
 	};
 };
@@ -224,7 +221,7 @@ private _aiHEVs = _dropDataArray select 2;// not used ???
 private _playersInDrop = _dropDataArray select 3;		
 private _aiInDrop = _dropDataArray select 4; // not used ???
 
-[SCRIPT_NAME,["Found players in drop:",_playerHEVs]] call OPTRE_fnc_hevPatchLog;
+[["Found players in drop: ",str _playerHEVs],false] call KISKA_fnc_log;
 
 /* ----------------------------------------------------------------------------
 
@@ -237,18 +234,18 @@ missionNamespace setVariable ["OPTRE_HEVLaunchNumber",_HEVLaunchNumber + 1];
 private _HEVLaunchNumberString = str _HEVLaunchNumber;
 private _countDownDoneEventString = ["OPTRE_HEV_countDownDoneEvent",_HEVLaunchNumberString] joinString "_";
 
-[SCRIPT_NAME,["HEV launch number is:",_HEVLaunchNumberString,"Count down done event string is:",_countDownDoneEventString]] call OPTRE_fnc_hevPatchLog;
+["HEV launch number is: ",_HEVLaunchNumberString," Count down done event string is: ",_countDownDoneEventString]] call KISKA_fnc_log;
 
 
 //// Determine need for player scripts or just AI
 
 // if there are no players, just launch pods after delay
 if !(_playersInDrop isEqualTo []) then {
-	HEV_LOG("No Players found in drop, going to server event")
+	["No Players found in drop, going to server event",false] call KISKA_fnc_log;
 
 	[
 		{
-			[SCRIPT_NAME,["Server event",_countDownDoneEventString,"sent. Countdown done"]] call OPTRE_fnc_hevPatchLog;
+			[["Server event: ",_countDownDoneEventString," sent. Countdown done."]] call KISKA_fnc_log;
 
 			[_this select 0] call CBA_fnc_serverEvent;
 		},
@@ -258,7 +255,7 @@ if !(_playersInDrop isEqualTo []) then {
 
 // if there are players:
 } else {
-	HEV_LOG("Players found in drop")
+	["Players found in drop",false] call KISKA_fnc_log;
 	// call countdown function on all players who will drop
 	private _firstPlayerInDrop = _playersInDrop select 0;
 	[_launchDelay,"Launch In",_firstPlayerInDrop,_countDownDoneEventString] remoteExecCall ["OPTRE_fnc_countDown",_playersInDrop];
@@ -313,7 +310,7 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 [
 	_countDownDoneEventString, 
 	{
-		HEV_LOG("Executing the countdown done server event")
+		["Executing the countdown done server event",false] call KISKA_fnc_log;
 
 		_thisArgs params [
 			"_allHEVsInDrop",
@@ -333,7 +330,7 @@ private _lastPod = _allHEVsInDrop select ((count _allHEVsInDrop) - 1);
 
 					_this remoteExec ["OPTRE_fnc_HEVBoosterDown",gunner _hev];
 					
-					[SCRIPT_NAME,["Sent booster down to HEV",_hev]] call OPTRE_fnc_hevPatchLog;
+					[["Sent booster down to HEV: ",_hev],false] call KISKA_fnc_log;
 				},
 				[_x,_randomXYVelocity,_launchSpeed,_hevDropArmtmosphereStartHeight,_ship,_deleteShip,_lastPod,_HEVLaunchNumber],
 				_forEachIndex * DROP_TIME_BUFFER // provide a buffer between each pods drop
@@ -431,7 +428,7 @@ private _chuteArrayEventID = [
 		];
 
 		if (isNull _chute) exitWith {
-			"null _chute passed to OPTRE_addChuteToDeletion" call BIS_fnc_error;
+			["null _chute passed to OPTRE_addChuteToDeletion",true] call KISKA_fnc_log;
 		};
 
 		private _chuteArray = missionNamespace getVariable [_chuteArrayVarString,[]];

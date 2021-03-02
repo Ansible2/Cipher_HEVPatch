@@ -26,8 +26,7 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define SCRIPT_NAME "OPTRE_fnc_HEVAtmoEffects"
-scriptName SCRIPT_NAME;
+scriptName "OPTRE_fnc_HEVAtmoEffects";
 
 params [
     ["_hev",objNull,[objNull]],
@@ -46,7 +45,7 @@ if (!alive _hev) exitWith {};
             ["_hevDropArmtmosphereStartHeight",3000,[1]]
         ];
 
-        [SCRIPT_NAME,["Pod is below atmo height",_hevDropArmtmosphereStartHeight,"starting effects"]] call OPTRE_fnc_hevPatchLog;
+        [["Pod is below atmo height of ",_hevDropArmtmosphereStartHeight,". Starting effects..."],false] call KISKA_fnc_log;
 
         private _light = "#lightpoint" createVehicle [0,0,0];
         _light attachTo [_hev, [0,1.5,-2]];
@@ -59,7 +58,7 @@ if (!alive _hev) exitWith {};
 
         private _hevPilot = gunner _hev;
         if (alive _hevPilot AND {isPlayer _hevPilot}) then { 
-            [SCRIPT_NAME,["Found alive player in HEV:",_hev,"playing reEntry effects"]] call OPTRE_fnc_hevPatchLog;
+            [["Found alive player in HEV: ",_hev,", playing reEntry effects..."],false] call KISKA_fnc_log;
             [40, _hev] call OPTRE_fnc_PlayerHEVEffectsUpdate_ReEntrySounds; 
         };
 
@@ -74,7 +73,7 @@ if (!alive _hev) exitWith {};
                 false
             };
 
-            [SCRIPT_NAME,[_hev,"reached end atmo effect height, deleting effects"]] call OPTRE_fnc_hevPatchLog;
+            [[_hev," reached end atmo effect height, deleting effects..."],false] call KISKA_fnc_log;
 
             _atmoEffects apply {deleteVehicle _x};
         };

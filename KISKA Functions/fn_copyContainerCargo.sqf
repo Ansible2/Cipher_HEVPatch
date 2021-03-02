@@ -1,34 +1,34 @@
 /* ----------------------------------------------------------------------------
-Function: OPTRE_fnc_getContainerCargo
+Function: KISKA_fnc_copyContainerCargo
 
 Description:
-	Saves the cargo of a container in a formatterd array to be used with OPTRE_fnc_addContainerCargo for copying cargo of containers.
-	Exact ammo counts will be preserved even inside of an item, such as magazines inside of a vest or backpack.
+	Saves the cargo of a container in a formatterd array to be used with KISKA_fnc_pasteContainerCargo for copying cargos of containers.
+	Exact ammo counts will be preserved even inside of an item such as magazines inside of a vest or backpack.
 
 Parameters:
-	0: _primaryContainer <OBJECT> - The container to save the cargo of.
+	0: _primaryContainer <OBJECT> - The container to save the cargo of
 
 Returns:
-	_totalCargo <ARRAY> - Formatted array of all items in cargo space of a container. 
-		Used with OPTRE_fnc_addContainerCargo. 
-		Will return [] if no cargo is present
+	_totalCargo <ARRAY> - Formatted array of all items in cargo space of a container. Used with KISKA_fnc_pasteContainerCargo. Will return [] if no cargo is present
 
 Examples:
     (begin example)
-
-		[container] call OPTRE_fnc_getContainerCargo;
-
+		[container] call KISKA_fnc_copyContainerCargo;
     (end)
 
 Author:
 	Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
+#define EMPTY_RETURN [[[],[]],[],[],[[],[]],[]]
+
+scriptName "KISKA_fnc_copyContainerCargo";
+
 params [
 	["_primaryContainer",objNull,[objNull]]
 ];
 
 if (isNull _primaryContainer) exitWith {
-	"_primaryContainer isNull" call BIS_fnc_error;
+	["_primaryContainer isNull",true] call KISKA_fnc_log;
 	[]	
 };
 
@@ -42,6 +42,7 @@ if !(_containers isEqualTo []) then {
 		private _containerClass = _x select 0;
 
 		private _weaponsCargo = [];
+		// gets a list of all weapons and their attachments/inserted mags
 		private _weaponsInContainer = weaponsItemsCargo _container;
 		if !(_weaponsInContainer isEqualTo []) then {
 			_weaponsInContainer apply {
@@ -63,21 +64,22 @@ if !(_weaponsInContainer isEqualTo []) then {
 };
 
 private _totalCargo = [
-	// itemCargo
+
 	getItemCargo _primaryContainer,
-	// magazineCargo
+
 	magazinesAmmoCargo _primaryContainer,
-	// weaponCargo
+
 	_weaponsCargo,
-	// backpackCargo
+
 	getBackpackCargo _primaryContainer,
-	// containers
+	// containers within containers
 	_containersInfo
 ];
 
-if (_totalCargo isEqualTo [[[],[]],[],[],[]]) exitWith {
-	diag_log ("OPTRE_fnc_getContainerCargo: No cargo found in " + str _primaryContainer);
+if (_totalCargo isEqualTo EMPTY_RETURN) exitWith {
+	[["No cargo found in ",_primaryContainer],true] call KISKA_fnc_log;
 	[]
 };
+
 
 _totalCargo

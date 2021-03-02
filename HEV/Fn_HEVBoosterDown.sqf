@@ -42,8 +42,7 @@ Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define SCRIPT_NAME "OPTRE_fnc_HEVBoosterDown"
-#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
+scriptName "OPTRE_fnc_HEVBoosterDown"
 
 params [
     ["_hev",objNull,[objNull]],
@@ -56,7 +55,7 @@ params [
     ["_HEVLaunchNumber",1,[1]]
 ];
 
-HEV_LOG("Reached function")
+[["Executing for HEV: ",_hev],false] call KISKA_fnc_log;
 
 detach _hev;
 playSound3D ["OPTRE_FunctionsLibrary\sound\PodDetach.ogg",_hev,false,getPosASL _hev,2,1,500];
@@ -64,26 +63,27 @@ playSound3D ["OPTRE_FunctionsLibrary\sound\PodDetach.ogg",_hev,false,getPosASL _
 private _light = "#lightpoint" createVehicle [0,0,0];
 _light attachTo [_hev, [0,1.5,2.5]];
 
-[0,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",-2];
-HEV_LOG("Sent light updates to all players")
+private _players = call CBA_fnc_players;
+[0,_hev,_light] remoteExecCall ["OPTRE_fnc_PlayerHEVEffectsUpdate_Light",_players];
+[["Sent light updates to all players for: ",_hev],false] call KISKA_fnc_log;
 
 private _smoke = "#particlesource" createVehicle [0,0,0]; 
 _smoke attachto [_hev,[0,-0.2,0.6]];
-[_smoke,"Missile2"] remoteExecCall ["setParticleClass",-2];
-HEV_LOG("Sent smoke particle update to all players")
+[_smoke,"Missile2"] remoteExecCall ["setParticleClass",_players];
+[["Sent smoke particle update to all players for: ",_hev],false] call KISKA_fnc_log;
 
 
 if (isPlayer (gunner _hev)) then {
-    [SCRIPT_NAME,["HEV",_hev,"has player in it","execing OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown"]] call OPTRE_fnc_hevPatchLog;
+    [["HEV: ",_hev," has player in it... Execing OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown"],false] call KISKA_fnc_log;
     [(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed,_hev,_hevDropAtmosphereStartHeight] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
 } else {
-    [SCRIPT_NAME,["HEV",_hev,"does not have a player in it, setting velocity"]] call OPTRE_fnc_hevPatchLog;
+    [["HEV: ",_hev," does not have a player in it, setting velocity directly."],false] call KISKA_fnc_log;
     [_hev,[(random _randomXYVelocity),(random _randomXYVelocity),_launchSpeed]] remoteExecCall ["setVelocity",_hev];
 };
 
 
 if ((_hev isEqualTo _lastPod) AND {_deleteShip} AND {!isNull _ship}) then {
-    [SCRIPT_NAME,["HEV",_hev,"is last pod in line up, wating to delete ship"]] call OPTRE_fnc_hevPatchLog;
+    [["HEV: ",_hev," is the last pod in line up, wating to delete ship..."],false] call KISKA_fnc_log;
 
     [
         {
@@ -91,7 +91,7 @@ if ((_hev isEqualTo _lastPod) AND {_deleteShip} AND {!isNull _ship}) then {
             private _deleteShipString = ["OPTRE_HEV_deleteShipEvent",_HEVLaunchNumber] joinString "_";
             missionNamespace setVariable [_deleteShipString,true,[0,2] select isMultiplayer];
 
-            [SCRIPT_NAME,["Sent delete ship string:",_deleteShipString,"to server"]] call OPTRE_fnc_hevPatchLog;
+            [["Sent delete ship string: ",_deleteShipString," to server"],false] call KISKA_fnc_log;
         },
         [_HEVLaunchNumber],
         10
@@ -103,4 +103,4 @@ sleep 2;
 
 [_smoke,_light] apply {deleteVehicle _x};
 
-[SCRIPT_NAME,["Deleted booster effects for HEV:",_hev]] call OPTRE_fnc_hevPatchLog;
+[["Deleted booster effects for HEV: ",_hev],false] call KISKA_fnc_log;

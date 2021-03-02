@@ -111,7 +111,7 @@ if ((_console getVariable ["OPTRE_PodsLaunchIn",-1]) isEqualTo 0) then {
 	private _randomOffset = 0;
 	_units apply {
 		private _unit = _x;
-		private _podCargo = [objectParent _unit] call OPTRE_fnc_getContainerCargo;
+		private _podCargo = [objectParent _unit] call KISKA_fnc_copyContainerCargo;
 
 		if !(_podCargo isEqualTo []) then {
 			_unit setVariable ["OPTRE_podCargo",_podCargo];

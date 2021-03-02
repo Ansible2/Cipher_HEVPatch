@@ -17,17 +17,14 @@ Returns:
 
 Examples:
     (begin example)
-
 		[myLightEffectType,myHEV,myParticleObject] call OPTRE_fnc_PlayerHEVEffectsUpdate_Light;
-
     (end)
 
 Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define SCRIPT_NAME "OPTRE_fnc_PlayerHEVEffectsUpdate_Light"
-#define HEV_LOG(MESSAGE) [SCRIPT_NAME,MESSAGE] call OPTRE_fnc_hevPatchLog;
+scriptName "OPTRE_fnc_PlayerHEVEffectsUpdate_Light"
 
 params[
 	["_lightEffect",1,[1]],
@@ -42,7 +39,7 @@ switch _lightEffect do {
 		_light setLightFlareSize 1;
 		_light setLightDayLight true;
 
-		[SCRIPT_NAME,["Updated lights for initial thruster effect on light",_light]] call OPTRE_fnc_hevPatchLog;
+		[["Updated lights for initial thruster effect on light: ",_light],false] call KISKA_fnc_log;
 	};
 	case 1: {										 	// REentry fire effect
 		_light setLightBrightness 1;
@@ -50,6 +47,6 @@ switch _lightEffect do {
 		_light setLightColor[0.9, 0.9, 0.3];
 		_light setLightDayLight true;
 
-		[SCRIPT_NAME,["Updated lights for REentry fire effect on light",_light]] call OPTRE_fnc_hevPatchLog;
+		[["Updated lights for REentry fire effect on light: ",_light],false] call KISKA_fnc_log;
 	};
 };

@@ -66,7 +66,7 @@ private _countHEVsLeft = 0;
 				clearItemCargoGlobal _hev;
 				clearBackpackCargoGlobal _hev;
 
-				[_hev,_copyCargo] call OPTRE_fnc_addContainerCargo;
+				[_hev,_copyCargo] call KISKA_fnc_pasteContainerCargo;
 			};
 	
 			// getting which side of the frigate to spawn on based upon even and odd number in drop order

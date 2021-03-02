@@ -113,10 +113,6 @@ class CfgFunctions
 		};
 		class Misc
 		{
-			class addContainerCargo
-			{
-				file="Cipher_HEVPatch\Misc\fn_addContainerCargo.sqf";
-			};
 			class CountDown
 			{
 				file="Cipher_HEVPatch\Misc\Fn_CountDown.sqf";
@@ -124,10 +120,6 @@ class CfgFunctions
 			class CleanUp
 			{
 				file="Cipher_HEVPatch\Misc\Fn_CleanUp.sqf";
-			};
-			class getContainerCargo
-			{
-				file="Cipher_HEVPatch\Misc\fn_getContainerCargo.sqf";
 			};
 			class hevPatchLog
 			{
@@ -148,6 +140,21 @@ class CfgFunctions
 			{
 				file = "Cipher_HEVPatch\Modules\Fn_ModuleHEVCleanUp.sqf"; 
 			};
+		};
+		
+	};
+
+	class KISKA
+	{
+		class KISKA_Functions_HevPatch
+		{
+			file = "Cipher_HEVPatch\KISKA Functions";
+			
+			class copyContainerCargo
+			{};
+			class log
+			{};
+			class pasteContainerCargo
 		};
 	};
 };

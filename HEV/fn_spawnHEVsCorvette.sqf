@@ -121,7 +121,7 @@ private _standardPodCargo = [[["OPTRE_Biofoam"],[2]],[["OPTRE_ELB47_Strobe",1],[
 				clearItemCargoGlobal _hev;
 				clearBackpackCargoGlobal _hev;
 
-				[_hev,_copyCargo] call OPTRE_fnc_addContainerCargo;
+				[_hev,_copyCargo] call KISKA_fnc_pasteContainerCargo;
 			};
 
 			// get relative position to attach pod to corvette

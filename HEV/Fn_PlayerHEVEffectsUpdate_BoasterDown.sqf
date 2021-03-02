@@ -19,16 +19,14 @@ Returns:
 
 Examples:
     (begin example)
-
 		[1,1,-1,myHEV,3000] call OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown;
-
     (end)
 
 Author:
 	Big_Wilk,
 	Modified by: Ansible2 // Cipher
 ---------------------------------------------------------------------------- */
-#define HEV_LOG(MESSAGE) ["OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown",MESSAGE] call OPTRE_fnc_hevPatchLog;
+scriptName "OPTRE_fnc_PlayerHEVEffectsUpdate_BoasterDown";
 
 if !(hasInterface) exitWith {};
 

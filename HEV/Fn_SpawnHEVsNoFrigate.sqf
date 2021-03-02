@@ -84,7 +84,7 @@ private _fn_OPTRESpawnHEVs = {
 			clearItemCargoGlobal _hev;
 			clearBackpackCargoGlobal _hev;
 
-			[_hev,_copyCargo] call OPTRE_fnc_addContainerCargo;
+			[_hev,_copyCargo] call KISKA_fnc_pasteContainerCargo;
 		};
 		
 		private _unitDir = getDir _unit;
